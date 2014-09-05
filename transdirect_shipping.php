@@ -310,9 +310,9 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 	/* hooking code */
 	/* If you're reading this you must know what you're doing ;-) Greetings from sunny Portugal! */
 	
-	add_filter('woocommerce_cart_totals_before_order_total', 'return_custom_price'); 
+	add_filter('woocommerce_cart_totals_before_order_total', 'tds_return_custom_price');
 	
-	function return_custom_price() {    
+	function tds_return_custom_price() {
 	    global $post, $woocommerce;
 		if (!session_id())session_start();
 		//var_dump(WC()->session->chosen_shipping_methods[0]);
@@ -345,9 +345,9 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 		}
 	}
 	
-	add_filter('woocommerce_email_order_meta_keys', 'my_custom_checkout_field_order_meta_keys');
+	add_filter('woocommerce_email_order_meta_keys', 'tds_custom_checkout_field_order_meta_keys');
 	
-	function my_custom_checkout_field_order_meta_keys( $keys ) {
+	function tds_custom_checkout_field_order_meta_keys( $keys ) {
 		global $post, $woocommerce;
 		if (!session_id())session_start();
 		if(WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect')
@@ -357,7 +357,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 		}
 	}
 	
-	function shipping_quotes_get()
+	function tds_shipping_quotes_get()
 	{
 		global $woocommerce,$wpdb;
 		if (!session_id())session_start();
@@ -429,11 +429,11 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 		}
 		
 	}
-	add_action( 'quotes_get_hook', 'shipping_quotes_get');
+	add_action( 'quotes_get_hook', 'tds_shipping_quotes_get');
 	
 	
 	
-	function plugin_test()
+	function tds_plugin_test()
 	{
 		global $woocommerce,$wpdb;
 		include 'transdirect-calculator.php';
@@ -441,13 +441,13 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 	}
 	
 	//cart page html show hooks
-	add_action( 'woocommerce_after_cart_totals', 'plugin_test');
-	add_action( 'woocommerce_review_order_before_payment', 'plugin_test');
+	add_action( 'woocommerce_after_cart_totals', 'tds_plugin_test');
+	add_action( 'woocommerce_review_order_before_payment', 'tds_plugin_test');
 	
 	//check out page price show hooks
-	add_filter('woocommerce_checkout_order_review', 'return_custom_price');
-	//add_filter('wp_ajax_woocommerce_update_order_review', 'return_custom_price');
-	//add_filter('wp_ajax_nopriv_woocommerce_update_order_review', 'return_custom_price');
+	add_filter('woocommerce_checkout_order_review', 'tds_return_custom_price');
+	//add_filter('wp_ajax_woocommerce_update_order_review', 'tds_return_custom_price');
+	//add_filter('wp_ajax_nopriv_woocommerce_update_order_review', 'tds_return_custom_price');
 	
 	add_filter( 'woocommerce_cart_shipping_method_full_label', 'remove_local_pickup_free_label', 10, 2 );
 	function remove_local_pickup_free_label($full_label, $method){
@@ -465,9 +465,9 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 	/**
 	* Process the checkout
 	*/
-	add_action('woocommerce_checkout_process', 'my_custom_checkout_field_process');
+	add_action('woocommerce_checkout_process', 'tds_custom_checkout_field_process');
 	
-	function my_custom_checkout_field_process() {
+	function tds_custom_checkout_field_process() {
 	// Check if set, if its not set add an error.
 	if ( ! $_POST['billing_postcode'] || !is_numeric($_POST['billing_postcode']))
 	wc_add_notice( __( 'Please enter a valid postcode/ZIP.' ), 'error' );

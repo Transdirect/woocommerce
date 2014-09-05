@@ -183,7 +183,7 @@ jQuery('#place_order').attr('disabled','disabled');
 ?>
 
 <script>
-function hideContent()
+function tds_hideContent()
 {
 jQuery( "#autocomplete-div" ).html('');
 jQuery( "#autocomplete-div" ).hide();
@@ -207,7 +207,7 @@ jQuery( document ).ready(function() {
    // });
 	/*jQuery( "#to_location" ).on('blur',function(e) 
 	{
-		hideContent();	
+		tds_hideContent();
 	});*/
 	jQuery('body').click( function() {
 	jQuery('#autocomplete-div').hide('');
@@ -232,7 +232,7 @@ jQuery(function() {
 }
 ?>
 <script>
-function validate()
+function tds_validate()
 {
 	
 	if(document.getElementById('to_location').value == '')
@@ -261,20 +261,20 @@ function validate()
 		});	
 	}
 }
-function get_value(postcode,locality)
+function tds_get_value(postcode,locality)
 {
 	 jQuery( "#to_location" ).val(postcode+','+locality);
 	 jQuery( "#autocomplete-div" ).html('');
 	 jQuery( "#autocomplete-div" ).hide();
 }
 
-function get_dynamic_value(field_id,locality)
+function tds_get_dynamic_value(field_id,locality)
 {
 	 jQuery("#"+field_id ).val(locality);
 	jQuery( "#dynamic_content" ).remove();
 }
 
-function get_quote(name)
+function tds_get_quote(name)
 {
 	var shipping_name = name;
 	var shipping_price = jQuery("#"+name+"_price").val();	
@@ -335,10 +335,10 @@ function get_quote(name)
 					jQuery( ".woocommerce-billing-fields" ).css('position', 'relative');
 					jQuery.each(data.locations, function( index, value ) {
 						if (content_type=='text') {
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
+							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
 						}
 						else{
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+'</li>';
+							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+'</li>';
 							
 						}
 								
@@ -378,10 +378,10 @@ function get_quote(name)
 					jQuery( ".woocommerce-billing-fields" ).css('position', 'relative');
 					jQuery.each(data.locations, function( index, value ) {
 						if (content_type=='text') {
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
+							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
 						}
 						else{
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+'</li>';
+							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+'</li>';
 							
 						}
 								
@@ -422,10 +422,10 @@ function get_quote(name)
 					jQuery( ".woocommerce-billing-fields" ).css('position', 'relative');
 					jQuery.each(data.locations, function( index, value ) {
 						if (content_type=='text') {
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
+							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
 						}
 						else{
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+' , '+value.locality+'</li>';
+							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+' , '+value.locality+'</li>';
 							
 						}
 								
@@ -466,10 +466,10 @@ function get_quote(name)
 					jQuery( ".woocommerce-shipping-fields" ).css('position', 'relative');
 					jQuery.each(data.locations, function( index, value ) {
 						if (content_type=='text') {
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
+							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
 						}
 						else{
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+'</li>';
+							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+'</li>';
 							
 						}
 								
@@ -509,10 +509,10 @@ function get_quote(name)
 					jQuery( ".woocommerce-shipping-fields" ).css('position', 'relative');
 					jQuery.each(data.locations, function( index, value ) {
 						if (content_type=='text') {
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
+							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
 						}
 						else{
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+'</li>';
+							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+'</li>';
 							
 						}
 								
@@ -553,10 +553,10 @@ function get_quote(name)
 					jQuery( ".woocommerce-shipping-fields" ).css('position', 'relative');
 					jQuery.each(data.locations, function( index, value ) {
 						if (content_type=='text') {
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
+							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
 						}
 						else{
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+' , '+value.locality+'</li>';
+							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+' , '+value.locality+'</li>';
 							
 						}
 								
@@ -604,7 +604,7 @@ if(WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect' && $_S
 										        
  		</p>	
 
-		<p><button type="button" name="calc_shipping" value="1" class="button" onclick="javascript:validate();"><?php _e( 'Get a quote', 'woocommerce' ); ?></button></p>
+		<p><button type="button" name="calc_shipping" value="1" class="button" onclick="javascript:tds_validate();"><?php _e( 'Get a quote', 'woocommerce' ); ?></button></p>
 
 		<?php wp_nonce_field( 'woocommerce-cart' ); ?>
 	</section>

@@ -1,6 +1,6 @@
 <?php
 $q=$_REQUEST['q'];
-function autocomplete_format($results) {
+function tds_autocomplete_format($results) {
     foreach ($results as $result) {
         echo $result[0] . '|' . $result[1] . "\n";
     }
@@ -27,7 +27,7 @@ if($q!='')
 		}
 	}
 	//var_dump($results);exit;
-	echo autocomplete_format($results);
+	echo tds_autocomplete_format($results);
 }
 else
 {
