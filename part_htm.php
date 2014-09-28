@@ -246,7 +246,7 @@ background-repeat:no-repeat!important
 		  <input class="" type="checkbox" name="<?php echo $field; ?>fied_error" id="<?php echo $field; ?>fied_error" style="" value="yes" <?php if($defult_values['fied_error'] == 'yes'){ ?>checked="checked" <?php } ?>> 
 			Fixed price on Error
 			<input type="price" name="<?php echo $field; ?>fied_error_price" id="<?php echo $field; ?>fied_error_price" style="width:50px;" value="<?php echo $defult_values['fied_error_price'];?>" placeholder="">
-			$ <img class="help_tip" data-tip=" If there is some error getting a quote, the fixed price listed will be returned." src="<?php echo plugins_url(); ?>/woocommerce/assets/images/help.png" height="16" width="16" />
+			<?php echo get_woocommerce_currency_symbol(); ?> <img class="help_tip" data-tip=" If there is some error getting a quote, the fixed price listed will be returned." src="<?php echo plugins_url(); ?>/woocommerce/assets/images/help.png" height="16" width="16" />
 			</td>
 		</tr>
 		<tr>
@@ -259,7 +259,7 @@ background-repeat:no-repeat!important
 		  <input class="" type="checkbox" name="<?php echo $field; ?>Surcharge" id="<?php echo $field; ?>Surcharge" style="" value="yes" <?php if($defult_values['Surcharge'] == 'yes'){ ?>checked="checked"<?php } ?>>
 			Handling Surcharge
 			<input type="text" name="<?php echo $field; ?>Surcharge_price" id="<?php echo $field; ?>Surcharge_price" style="width:50px;" value="<?php echo $defult_values['Surcharge_price'];?>" placeholder="">
-			$ <img class="help_tip" data-tip="Add a surcharge to the quoted amounts." src="<?php echo plugins_url(); ?>/woocommerce/assets/images/help.png" height="16" width="16" />			
+			<?php echo get_woocommerce_currency_symbol(); ?>  <img class="help_tip" data-tip="Add a surcharge to the quoted amounts." src="<?php echo plugins_url(); ?>/woocommerce/assets/images/help.png" height="16" width="16" />			
 			</td>
 		</tr>
 		<tr>

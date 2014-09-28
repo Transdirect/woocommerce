@@ -25,6 +25,13 @@ p.form-row-wide {margin:5px 0 !important;}
 p.form-row-wide input[type="text"] {width:202px;}
 .woocommerce table.shop_table tfoot td, .woocommerce table.shop_table tfoot th, .woocommerce-page table.shop_table tfoot td, .woocommerce-page table.shop_table tfoot th {font-weight:normal;}
 .woocommerce .cart-collaterals, .woocommerce-page .cart-collaterals { position:relative; }
+.loadinggif 
+{
+   background:
+     url('<?php echo site_url(); ?>/wp-content/plugins/transdirect-shipping/ajax-loader.gif')
+     no-repeat
+     right center;
+}
 </style>
 
 <?php
@@ -86,7 +93,7 @@ if(!empty($_POST['shipping_variation']))
 	
 }
 
-if($_SESSION['price'] && WC()->session->chosen_shipping_methods[0] =='woocommerce_transdirect')
+if(isset($_SESSION['price']) && WC()->session->chosen_shipping_methods[0] =='woocommerce_transdirect')
 {
 	$price = $_SESSION['price'];
 	WC()->shipping->shipping_total = $price;
@@ -167,33 +174,36 @@ if(!empty($_POST['to_location']))
 
 if(WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect')
 {
-if($_SESSION['price'] =='' || $_SESSION['price'] ==0)
-{
-?>
-<style>
-#place_order{
-display:none !important;
-}
-</style>
-<script>
-jQuery('#place_order').attr('disabled','disabled');
-</script>
-<?php
-}
+
+	if(!isset($_SESSION['price']) || $_SESSION['price'] =='' || $_SESSION['price'] ==0)
+	{
+	?>
+	<style>
+	#place_order{
+	display:none !important;
+	}
+	</style>
+	<script>
+	jQuery('#place_order').attr('disabled','disabled');
+	</script>
+	<?php
+	}
+
 ?>
 
 <script>
-function tds_hideContent()
+function hideContent()
 {
 jQuery( "#autocomplete-div" ).html('');
 jQuery( "#autocomplete-div" ).hide();
 }
 	
 jQuery( document ).ready(function() {	
+	//jQuery.ajaxSetup({async:false});
 	
-	 jQuery("#shipping_method_0_woocommerce_transdirect").on('click',function(){
+	/* jQuery("#shipping_method_0_woocommerce_transdirect").on('click',function(){
 		alert('fdgdfgd');
-		});
+		});*/
 	
    jQuery("#trans_frm").show();
    
@@ -207,381 +217,409 @@ jQuery( document ).ready(function() {
    // });
 	/*jQuery( "#to_location" ).on('blur',function(e) 
 	{
-		tds_hideContent();
+		hideContent();	
 	});*/
 	jQuery('body').click( function() {
 	jQuery('#autocomplete-div').hide('');
 	jQuery('#dynamic_content').hide('');
 	
 	});
-   
+	var latestRequestNumber = 0;
+	var globalTimeout = null;  
+	jQuery('#to_location').keyup(function(){
+	 /*if(globalTimeout != null) clearTimeout(globalTimeout);
+	 jQuery('#to_location').addClass('loadinggif');
+	 globalTimeout =setTimeout(toFunc,200);
+	 latestRequestNumber++;
+	 toFunc(latestRequestNumber);*/
+	 
+	    var key_val = jQuery( "#to_location" ).val();
+		   
+	    var position = jQuery( "#to_location" ).position();		
+	    var html = '';
+	   // jQuery( "#autocomplete-div" ).html('');
+	    //jQuery( "#autocomplete-div" ).hide();
+	    
+	 //  if (key_val!='') {
+	      jQuery('#to_location').addClass('loadinggif');
+	      if (key_val=='') {
+	       key_val=0;
+	      }
+	   jQuery.getJSON( "<?php echo plugins_url( 'locations.php' , __FILE__ ); ?>",{'q':key_val, requestNumber: ++latestRequestNumber}, function( data ) {
+			
+		   if (data.requestNumber < latestRequestNumber){  return; }
+		   if(data.locations!='' && key_val!='0')                                    
+		   {
+		    
+		   jQuery.each(data.locations, function( index, value ) {	
+					   html =html+'<li onclick="get_value(\''+value.postcode+'\',\''+value.locality+'\')">'+value.postcode+' , '+value.locality+'</li>';
+				   });
+		   
+				   var main_content = '<ul id="auto_complete">'+html+'</ul>';
+				   //console.log(main_content);
+				   jQuery( "#loading-div" ).hide();
+				   jQuery( "#autocomplete-div" ).show();
+				   jQuery( "#autocomplete-div" ).html(main_content);
+				   jQuery( "#autocomplete-div" ).css('left', position.left);
+				   jQuery( "#autocomplete-div" ).css('top', parseInt(position.top)+38);
+		   }
+		   else{
+		      jQuery( "#autocomplete-div" ).hide();
+		   }
+		   //jQuery("#to_location").prop('disabled',false);
+		   jQuery('#to_location').removeClass('loadinggif');
+				   
+				   
+		   
+	   });
+	  /* }
+	   else{
+	   jQuery('#to_location').removeClass('loadinggif');	
+	   }*/
 	
-});
-
-jQuery(function() {
-
-    jQuery("#to_location").autocomplete('<?php echo plugins_url( 'locations_new.php' , __FILE__ ); ?>', {
-        minChars: 1,
-	selectFirst: true,
-        autoFill: true,
-    });
-});
+	});
+});	
+   
 </script>
 
 <?php
 }
 ?>
 <script>
-function tds_validate()
-{
-	
-	if(document.getElementById('to_location').value == '')
-	{
-		alert("Please select a to location");
-		return false;
-	}
-	else if(document.getElementById('to_type').value == '')
-	{
-		alert("Please select a to location");
-		return false;
-	}	
-	else
-	{
-			//document.trans_frm.submit();
-		//	jQuery("#trans_frm").submit();
-		jQuery.post( "<?php echo plugins_url( 'quotes.php' , __FILE__ ); ?>",{'to_location':document.getElementById('to_location').value,'to_type':document.getElementById('to_type').value}, function( data ) {			//alert(data);
-			if(data == '5')window.location.reload();
-			else
-			{
-				jQuery( "#shipping_type" ).html('');
-				jQuery( "#shipping_type" ).append(data);
-				//jQuery( "#trans_frm" ).hide();
-				jQuery( "#shipping_type" ).show();
-			}
-		});	
-	}
-}
-function tds_get_value(postcode,locality)
+
+function get_value(postcode,locality)
 {
 	 jQuery( "#to_location" ).val(postcode+','+locality);
 	 jQuery( "#autocomplete-div" ).html('');
 	 jQuery( "#autocomplete-div" ).hide();
 }
 
-function tds_get_dynamic_value(field_id,locality)
+function get_dynamic_value(field_id,locality)
 {
 	 jQuery("#"+field_id ).val(locality);
 	jQuery( "#dynamic_content" ).remove();
 }
 
-function tds_get_quote(name)
-{
-	var shipping_name = name;
-	var shipping_price = jQuery("#"+name+"_price").val();	
-	var shipping_transit_time = jQuery("#"+name+"_transit_time").val();
-	var shipping_service_type = jQuery("#"+name+"_service_type").val();
-	//jQuery("#shipping_type").submit();
-	jQuery.post( "<?php echo plugins_url( 'shipping_price.php' , __FILE__ ); ?>",{'shipping_name':shipping_name,'shipping_price':shipping_price,'shipping_transit_time':shipping_transit_time,'shipping_service_type':shipping_service_type}, function( data ) {
-			//localStorage.setItem("update_status", "1");
-			window.location.reload();
-			/*location.reload(function(){
-			jQuery("#trans_frm").hide();
-			});*/
-		});
-}
+
 </script>
 
 
 	<script>
+		
 		jQuery( document ).ready(function() {
-			
-			jQuery("#billing_city").autocomplete('<?php echo plugins_url( 'city_new.php' , __FILE__ ); ?>', {
-			minChars: 1
-			});
-			jQuery("#billing_state").autocomplete('<?php echo plugins_url( 'city_new.php' , __FILE__ ); ?>', {
-			minChars: 1
-			});
-			jQuery("#billing_postcode").autocomplete('<?php echo plugins_url( 'postcode_new.php' , __FILE__ ); ?>', {
-			minChars: 1
-			});
-			jQuery("#shipping_city").autocomplete('<?php echo plugins_url( 'city_new.php' , __FILE__ ); ?>', {
-			minChars: 1
-			});
-			jQuery("#shipping_state").autocomplete('<?php echo plugins_url( 'city_new.php' , __FILE__ ); ?>', {
-			minChars: 1
-			});
-			jQuery("#shipping_postcode").autocomplete('<?php echo plugins_url( 'postcode_new.php' , __FILE__ ); ?>', {
-			minChars: 1
-			});
-				
-			
-			/*jQuery( "#billing_city").keyup(function() 
-			{
-				var key_val = jQuery( this ).val();
-				var key_id = jQuery( this ).attr('id');
-				var position = jQuery( this ).position();		
-				var html = '';
-				var content_type = '';
-				if (key_id == 'billing_city') {
-					content_type = 'text';
-				}
-				
-				
-				jQuery.getJSON( "<?php echo plugins_url( 'locations.php' , __FILE__ ); ?>",{'q':key_val}, function( data ) {
-					
-					if(jQuery( "#dynamic_content" ).length)jQuery( "#dynamic_content" ).remove();					
-					if(data.locations!='')
-					{
-					jQuery( ".woocommerce-billing-fields" ).css('position', 'relative');
-					jQuery.each(data.locations, function( index, value ) {
-						if (content_type=='text') {
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
-						}
-						else{
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+'</li>';
-							
-						}
-								
-							});
-					var top_cal = parseInt(position.top)+40;
-							var main_content = '<div id="dynamic_content" style="cursor:pointer;overflow: auto;background-color:#FFFFFF;z-index:1000; position: absolute;  width: 189px;height: 200px; top:'+position.top_cal+'px;"><ul >'+html+'</ul></div>';
-							
-							//console.log(main_content);							
-							jQuery( "#"+key_id+"_field" ).append(main_content);							
-							//jQuery( "#autocomplete-div" ).css('top', parseInt(position.top)+38);
-					}	
-							
-				});	
-				
-				
+		  
+			var latestRequestNumber1 = 0;	
+			jQuery('#billing_city').keyup(function(){
+				 jQuery('#billing_city').addClass('loadinggif');
+				var key_val = jQuery( '#billing_city' ).val();
+				 var key_id = jQuery( '#billing_city' ).attr('id');
+				 var position = jQuery( '#billing_city' ).position();		
+				 var html = '';
+				 var content_type = '';
+				 if (key_id == 'billing_city') {
+					 content_type = 'text';
+				 }
+				 
+				 if (key_val=='') {
+					 jQuery('#billing_city').removeClass('loadinggif');
+					 key_val = 0;
+				 }
+				 jQuery.getJSON( "<?php echo plugins_url( 'locations.php' , __FILE__ ); ?>",{'q':key_val,requestNumber: ++latestRequestNumber1}, function( data ) {
+					 
+					// if(jQuery( "#dynamic_content" ).length)jQuery( "#dynamic_content" ).remove();
+				         if (data.requestNumber < latestRequestNumber1)  { return; }
+					 if(data.locations!='' && key_val!='0')
+					 {
+					 jQuery( ".woocommerce-billing-fields" ).css('position', 'relative');
+					 jQuery.each(data.locations, function( index, value ) {
+						 if (content_type=='text') {
+							 html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
+						 }
+						 else{
+							 html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+'</li>';
+							 
+						 }
+								 
+							 });
+					 var top_cal = parseInt(position.top)+40;
+							 var main_content = '<div id="dynamic_content" style="cursor:pointer;overflow: auto;background-color:#FFFFFF;z-index:1000; position: absolute;  width: 189px;height: 200px; top:'+position.top_cal+'px;"><ul >'+html+'</ul></div>';
+							 
+							 //console.log(main_content);							
+							 jQuery( "#"+key_id+"_field" ).append(main_content);							
+							 //jQuery( "#autocomplete-div" ).css('top', parseInt(position.top)+38);
+							  jQuery('#billing_city').removeClass('loadinggif');
+					 }
+					  else{
+					     jQuery( "#dynamic_content" ).remove();
+					      jQuery('#billing_city').removeClass('loadinggif');
+					  }
+							 
+				 });
+				 //jQuery('#billing_city').removeClass('loadinggif');
 			});
 			
 			
-			
-			jQuery( "#billing_state").keyup(function() 
-			{
-				var key_val = jQuery( this ).val();
-				var key_id = jQuery( this ).attr('id');
-				var position = jQuery( this ).position();		
-				var html = '';
-				var content_type = '';
-				if (key_id == 'billing_state') {
-					content_type = 'text';
-				}
-				
-				
-				jQuery.getJSON( "<?php echo plugins_url( 'locations.php' , __FILE__ ); ?>",{'q':key_val}, function( data ) {
-					
-					if(jQuery( "#dynamic_content" ).length)jQuery( "#dynamic_content" ).remove();					
-					if(data.locations!='')
-					{
-					jQuery( ".woocommerce-billing-fields" ).css('position', 'relative');
-					jQuery.each(data.locations, function( index, value ) {
-						if (content_type=='text') {
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
-						}
-						else{
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+'</li>';
-							
-						}
-								
-							});
-					var top_cal = parseInt(position.top)+40;
-							var main_content = '<div id="dynamic_content" style="cursor:pointer;overflow: auto;background-color:#FFFFFF;z-index:1000; position: absolute;  width: 189px;height: 200px; top:'+position.top_cal+'px;"><ul >'+html+'</ul></div>';
-							
-							//console.log(main_content);							
-							jQuery( "#"+key_id+"_field" ).append(main_content);							
-							//jQuery( "#autocomplete-div" ).css('top', parseInt(position.top)+38);
-					}	
-							
-				});	
-				
-				
+			var latestRequestNumber2 = 0; 
+			jQuery('#billing_state').keyup(function(){
+			    jQuery('#billing_state').addClass('loadinggif');
+				var key_val = jQuery( "#billing_state" ).val();
+				 var key_id = jQuery( "#billing_state" ).attr('id');
+				 var position = jQuery( "#billing_state" ).position();		
+				 var html = '';
+				 var content_type = '';
+				 if (key_id == 'billing_state') {
+					 content_type = 'text';
+				 }
+				 
+				 if (key_val=='') {
+					 jQuery('#billing_state').removeClass('loadinggif');
+					 key_val =0;
+				 }
+				 
+				 
+				 jQuery.getJSON( "<?php echo plugins_url( 'locations.php' , __FILE__ ); ?>",{'q':key_val,requestNumber: ++latestRequestNumber2}, function( data ) {
+					 
+					 //if(jQuery( "#dynamic_content" ).length)jQuery( "#dynamic_content" ).remove();
+				         if (data.requestNumber < latestRequestNumber2)  {return; }
+					 if(data.locations!='' && key_val!=0)
+					 {
+					 jQuery( ".woocommerce-billing-fields" ).css('position', 'relative');
+					 jQuery.each(data.locations, function( index, value ) {
+						 if (content_type=='text') {
+							 html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
+						 }
+						 else{
+							 html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+'</li>';
+							 
+						 }
+								 
+							 });
+					 var top_cal = parseInt(position.top)+40;
+							 var main_content = '<div id="dynamic_content" style="cursor:pointer;overflow: auto;background-color:#FFFFFF;z-index:1000; position: absolute;  width: 189px;height: 200px; top:'+position.top_cal+'px;"><ul >'+html+'</ul></div>';
+							 
+							 //console.log(main_content);							
+							 jQuery( "#"+key_id+"_field" ).append(main_content);							
+							 //jQuery( "#autocomplete-div" ).css('top', parseInt(position.top)+38);
+							 jQuery('#billing_state').removeClass('loadinggif'); 
+					 }
+					  else{
+					     jQuery( "#dynamic_content" ).remove();
+					      jQuery('#billing_state').removeClass('loadinggif');
+					  }
+							 
+				 });
+				 
 			});
 			
-			
-			
-			jQuery( "#billing_postcode").keyup(function() 
-			{
-				//alert('hiii');
-				var key_val = jQuery( this ).val();
-				var key_id = jQuery( this ).attr('id');
-				var position = jQuery( this ).position();		
-				var html = '';
-				var content_type = '';
-				if (key_id == 'billing_postcode') {
-					content_type = 'numeric';
-				}
-				
-				
-				jQuery.getJSON( "<?php echo plugins_url( 'locations.php' , __FILE__ ); ?>",{'q':key_val}, function( data ) {
-					
-					if(jQuery( "#dynamic_content" ).length)jQuery( "#dynamic_content" ).remove();					
-					if(data.locations!='')
-					{
-					jQuery( ".woocommerce-billing-fields" ).css('position', 'relative');
-					jQuery.each(data.locations, function( index, value ) {
-						if (content_type=='text') {
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
-						}
-						else{
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+' , '+value.locality+'</li>';
-							
-						}
-								
-							});
-						var top_cal = parseInt(position.top)+40;
-							var main_content = '<div id="dynamic_content" style="cursor:pointer;overflow: auto;background-color:#FFFFFF;z-index:1000; position: absolute;  width: 189px;height: 200px; top:'+position.top_cal+'px;"><ul >'+html+'</ul></div>';
-							
-							//console.log(main_content);							
-							jQuery( "#"+key_id+"_field" ).append(main_content);							
-							//jQuery( "#autocomplete-div" ).css('top', parseInt(position.top)+38);
-					}	
-							
-				});	
-				
-				
-			});
-			
-			
-			
-			
-			jQuery( "#shipping_city").keyup(function() 
-			{
-				var key_val = jQuery( this ).val();
-				var key_id = jQuery( this ).attr('id');
-				var position = jQuery( this ).position();		
-				var html = '';
-				var content_type = '';
-				if (key_id == 'shipping_city') {
-					content_type = 'text';
-				}
-				
-				
-				jQuery.getJSON( "<?php echo plugins_url( 'locations.php' , __FILE__ ); ?>",{'q':key_val}, function( data ) {
-					
-					if(jQuery( "#dynamic_content" ).length)jQuery( "#dynamic_content" ).remove();					
-					if(data.locations!='')
-					{
-					jQuery( ".woocommerce-shipping-fields" ).css('position', 'relative');
-					jQuery.each(data.locations, function( index, value ) {
-						if (content_type=='text') {
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
-						}
-						else{
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+'</li>';
-							
-						}
-								
-							});
-					var top_cal = parseInt(position.top)+40;
-							var main_content = '<div id="dynamic_content" style="cursor:pointer;overflow: auto;background-color:#FFFFFF;z-index:1000; position: absolute;  width: 189px;height: 200px; top:'+position.top_cal+'px;"><ul >'+html+'</ul></div>';
-							
-							//console.log(main_content);							
-							jQuery( "#"+key_id+"_field" ).append(main_content);							
-							//jQuery( "#autocomplete-div" ).css('top', parseInt(position.top)+38);
-					}	
-							
-				});	
-				
+			var latestRequestNumber3 = 0;   
+			jQuery('#billing_postcode').keyup(function(){
+			    jQuery('#billing_postcode').addClass('loadinggif');
+				var key_val = jQuery( "#billing_postcode" ).val();
+				 var key_id = jQuery( "#billing_postcode" ).attr('id');
+				 var position = jQuery( "#billing_postcode" ).position();		
+				 var html = '';
+				 var content_type = '';
+				 if (key_id == 'billing_postcode') {
+					 content_type = 'numeric';
+				 }
+				 if (key_val=='') {
+					 jQuery('#billing_postcode').removeClass('loadinggif');
+					 key_val =0;
+				 }
+				 
+				 
+				 jQuery.getJSON( "<?php echo plugins_url( 'locations.php' , __FILE__ ); ?>",{'q':key_val,requestNumber: ++latestRequestNumber3}, function( data ) {
+					 
+					 //if(jQuery( "#dynamic_content" ).length)jQuery( "#dynamic_content" ).remove();
+					 if (data.requestNumber < latestRequestNumber3)  { return; }
+					 if(data.locations!='' && key_val!=0)
+					 {
+					 jQuery( ".woocommerce-billing-fields" ).css('position', 'relative');
+					 jQuery.each(data.locations, function( index, value ) {
+						 if (content_type=='text') {
+							 html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
+						 }
+						 else{
+							 html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+' , '+value.locality+'</li>';
+							 
+						 }
+								 
+							 });
+						 var top_cal = parseInt(position.top)+40;
+							 var main_content = '<div id="dynamic_content" style="cursor:pointer;overflow: auto;background-color:#FFFFFF;z-index:1000; position: absolute;  width: 189px;height: 200px; top:'+position.top_cal+'px;"><ul >'+html+'</ul></div>';
+							 
+							 //console.log(main_content);							
+							 jQuery( "#"+key_id+"_field" ).append(main_content);							
+							 //jQuery( "#autocomplete-div" ).css('top', parseInt(position.top)+38);
+							  jQuery('#billing_postcode').removeClass('loadinggif');
+					 }
+					 else{
+					     jQuery( "#dynamic_content" ).remove();
+					      jQuery('#billing_postcode').removeClass('loadinggif');
+					  }
+							 
+				 });
 				
 			});
 			
 			
+			var latestRequestNumber4 = 0;  
+			jQuery('#shipping_city').keyup(function(){
+			    jQuery('#shipping_city').addClass('loadinggif'); 
+				 var key_val = jQuery( "#shipping_city" ).val();
+				 var key_id = jQuery( "#shipping_city" ).attr('id');
+				 var position = jQuery( "#shipping_city" ).position();		
+				 var html = '';
+				 var content_type = '';
+				 if (key_id == 'shipping_city') {
+					 content_type = 'text';
+				 }
+				 if (key_val=='') {
+					 jQuery('#shipping_city').removeClass('loadinggif');
+					 key_val = 0;
+				 }
+				 
+				 
+				 jQuery.getJSON( "<?php echo plugins_url( 'locations.php' , __FILE__ ); ?>",{'q':key_val,requestNumber: ++latestRequestNumber4}, function( data ) {
+					 
+					 if (data.requestNumber < latestRequestNumber4)  { return; }				
+					 if(data.locations!='' && key_val!=0)
+					 {
+					 jQuery( ".woocommerce-shipping-fields" ).css('position', 'relative');
+					 jQuery.each(data.locations, function( index, value ) {
+						 if (content_type=='text') {
+							 html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
+						 }
+						 else{
+							 html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+'</li>';
+							 
+						 }
+								 
+							 });
+					 var top_cal = parseInt(position.top)+40;
+							 var main_content = '<div id="dynamic_content" style="cursor:pointer;overflow: auto;background-color:#FFFFFF;z-index:1000; position: absolute;  width: 189px;height: 200px; top:'+position.top_cal+'px;"><ul >'+html+'</ul></div>';
+							 
+							 //console.log(main_content);							
+							 jQuery( "#"+key_id+"_field" ).append(main_content);							
+							 //jQuery( "#autocomplete-div" ).css('top', parseInt(position.top)+38);
+							  jQuery('#shipping_city').removeClass('loadinggif'); 
+					 }
+					 else{
+					     jQuery( "#dynamic_content" ).remove();
+					      jQuery('#shipping_city').removeClass('loadinggif');
+					  }
+							 
+				 });
+				
+			});
 			
-			jQuery( "#shipping_state").keyup(function() 
-			{
-				var key_val = jQuery( this ).val();
-				var key_id = jQuery( this ).attr('id');
-				var position = jQuery( this ).position();		
-				var html = '';
-				var content_type = '';
-				if (key_id == 'shipping_state') {
-					content_type = 'text';
-				}
+			var latestRequestNumber5 = 0;
+			jQuery('#shipping_state').keyup(function(){
+			     jQuery('#shipping_state').addClass('loadinggif');
+				var key_val = jQuery( "#shipping_state" ).val();
+				 var key_id = jQuery( "#shipping_state" ).attr('id');
+				 var position = jQuery( "#shipping_state" ).position();		
+				 var html = '';
+				 var content_type = '';
+				 if (key_id == 'shipping_state') {
+					 content_type = 'text';
+				 }
+				 if (key_val=='') {
+					 jQuery('#shipping_state').removeClass('loadinggif');
+					 key_val = 0;
+				 }
+				 
+				 
+				 jQuery.getJSON( "<?php echo plugins_url( 'locations.php' , __FILE__ ); ?>",{'q':key_val,requestNumber: ++latestRequestNumber5}, function( data ) {
+					 
+					 if (data.requestNumber < latestRequestNumber5)  { return; }				
+					 if(data.locations!='' && key_val!=0)
+					 {
+					 jQuery( ".woocommerce-shipping-fields" ).css('position', 'relative');
+					 jQuery.each(data.locations, function( index, value ) {
+						 if (content_type=='text') {
+							 html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
+						 }
+						 else{
+							 html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+'</li>';
+							 
+						 }
+								 
+							 });
+					 var top_cal = parseInt(position.top)+40;
+							 var main_content = '<div id="dynamic_content" style="cursor:pointer;overflow: auto;background-color:#FFFFFF;z-index:1000; position: absolute;  width: 189px;height: 200px; top:'+position.top_cal+'px;"><ul >'+html+'</ul></div>';
+							 
+							 //console.log(main_content);							
+							 jQuery( "#"+key_id+"_field" ).append(main_content);							
+							  jQuery('#shipping_state').removeClass('loadinggif');
+					 }
+					  else{
+					     jQuery( "#dynamic_content" ).remove();
+					      jQuery('#shipping_state').removeClass('loadinggif');
+					  }
+							 
+				 });
 				
-				
-				jQuery.getJSON( "<?php echo plugins_url( 'locations.php' , __FILE__ ); ?>",{'q':key_val}, function( data ) {
-					
-					if(jQuery( "#dynamic_content" ).length)jQuery( "#dynamic_content" ).remove();					
-					if(data.locations!='')
-					{
-					jQuery( ".woocommerce-shipping-fields" ).css('position', 'relative');
-					jQuery.each(data.locations, function( index, value ) {
-						if (content_type=='text') {
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
-						}
-						else{
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+'</li>';
-							
-						}
-								
-							});
-					var top_cal = parseInt(position.top)+40;
-							var main_content = '<div id="dynamic_content" style="cursor:pointer;overflow: auto;background-color:#FFFFFF;z-index:1000; position: absolute;  width: 189px;height: 200px; top:'+position.top_cal+'px;"><ul >'+html+'</ul></div>';
-							
-							//console.log(main_content);							
-							jQuery( "#"+key_id+"_field" ).append(main_content);							
-							//jQuery( "#autocomplete-div" ).css('top', parseInt(position.top)+38);
-					}	
-							
-				});	
-				
+			});
+			
+			var latestRequestNumber6 = 0;  
+			jQuery('#shipping_postcode').keyup(function(){
+				  jQuery('#shipping_postcode').addClass('loadinggif');
+				var key_val = jQuery( "#shipping_postcode" ).val();
+				 var key_id = jQuery( "#shipping_postcode" ).attr('id');
+				 var position = jQuery( "#shipping_postcode" ).position();		
+				 var html = '';
+				 var content_type = '';
+				 if (key_id == 'shipping_postcode') {
+					 content_type = 'numeric';
+				 }
+				 if (key_val=='') {
+					 jQuery('#shipping_postcode').removeClass('loadinggif');
+					 key_val = 0;
+				 }
+				 
+				 jQuery.getJSON( "<?php echo plugins_url( 'locations.php' , __FILE__ ); ?>",{'q':key_val,requestNumber: ++latestRequestNumber6}, function( data ) {
+					 
+					 if (data.requestNumber < latestRequestNumber6)  { return; }						
+					 if(data.locations!='' && key_val!=0)
+					 {
+					 jQuery( ".woocommerce-shipping-fields" ).css('position', 'relative');
+					 jQuery.each(data.locations, function( index, value ) {
+						 if (content_type=='text') {
+							 html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
+						 }
+						 else{
+							 html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+' , '+value.locality+'</li>';
+							 
+						 }
+								 
+							 });
+						 var top_cal = parseInt(position.top)+40;
+							 var main_content = '<div id="dynamic_content" style="cursor:pointer;overflow: auto;background-color:#FFFFFF;z-index:1000; position: absolute;  width: 189px;height: 200px; top:'+position.top_cal+'px;"><ul >'+html+'</ul></div>';
+							 
+							 //console.log(main_content);							
+							 jQuery( "#"+key_id+"_field" ).append(main_content);							
+							  jQuery('#shipping_postcode').removeClass('loadinggif');
+					 }
+					  else{
+					     jQuery( "#dynamic_content" ).remove();
+					      jQuery('#shipping_postcode').removeClass('loadinggif');
+					  }
+							 
+				 });
 				
 			});
 			
 			
-			
-			jQuery( "#shipping_postcode").keyup(function() 
-			{
-				//alert('hiii');
-				var key_val = jQuery( this ).val();
-				var key_id = jQuery( this ).attr('id');
-				var position = jQuery( this ).position();		
-				var html = '';
-				var content_type = '';
-				if (key_id == 'shipping_postcode') {
-					content_type = 'numeric';
-				}
-				
-				
-				jQuery.getJSON( "<?php echo plugins_url( 'locations.php' , __FILE__ ); ?>",{'q':key_val}, function( data ) {
-					
-					if(jQuery( "#dynamic_content" ).length)jQuery( "#dynamic_content" ).remove();					
-					if(data.locations!='')
-					{
-					jQuery( ".woocommerce-shipping-fields" ).css('position', 'relative');
-					jQuery.each(data.locations, function( index, value ) {
-						if (content_type=='text') {
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
-						}
-						else{
-							html =html+'<li style="list-style: none;margin:0;padding:0;" onclick="tds_get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+' , '+value.locality+'</li>';
-							
-						}
-								
-							});
-						var top_cal = parseInt(position.top)+40;
-							var main_content = '<div id="dynamic_content" style="cursor:pointer;overflow: auto;background-color:#FFFFFF;z-index:1000; position: absolute;  width: 189px;height: 200px; top:'+position.top_cal+'px;"><ul >'+html+'</ul></div>';
-							
-							//console.log(main_content);							
-							jQuery( "#"+key_id+"_field" ).append(main_content);							
-							//jQuery( "#autocomplete-div" ).css('top', parseInt(position.top)+38);
-					}	
-							
-				});	
-				
-				
-			});*/
 		});
 		
+		
+		
 	</script>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-<script type="text/javascript" src="<?php echo plugins_url( 'src/jquery.autocomplete.js' , __FILE__ ); ?>"></script>
-<link href="<?php echo plugins_url( 'src/jquery.autocomplete.css' , __FILE__ ); ?>" rel='stylesheet' type='text/css' />
+
 <?php
 //var_dump($_SESSION['price']);
-if(WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect' && $_SESSION['price'] ==0)
+if(WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect' && !isset($_SESSION['price']))
 {
 ?>
 <div class="shipping_calculator" id="trans_frm">
@@ -604,7 +642,7 @@ if(WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect' && $_S
 										        
  		</p>	
 
-		<p><button type="button" name="calc_shipping" value="1" class="button" onclick="javascript:tds_validate();"><?php _e( 'Get a quote', 'woocommerce' ); ?></button></p>
+		<p><button type="button" name="calc_shipping" value="1" class="button" onclick="javascript:validate('<?php echo plugins_url( 'quotes.php' , __FILE__ ); ?>');"><?php _e( 'Get a quote', 'woocommerce' ); ?></button></p>
 
 		<?php wp_nonce_field( 'woocommerce-cart' ); ?>
 	</section>
