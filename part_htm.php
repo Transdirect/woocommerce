@@ -20,6 +20,7 @@
 	#autocomplete-div {background:#FFFFFF; border: 1px solid #EDEDED; border-radius: 3px 3px 3px 3px; display: none; height: 200px;  margin: -5px 0 0 1px; overflow: auto; padding: 5px; position: absolute;  width: 189px;   z-index: 99;}
 	#autocomplete-div ul li {padding:0 !important;margin:0 !important; text-indent:0 !important;list-style: none;cursor:pointer;}
 	#autocomplete-div ul li:hover {background:#ededed;list-style: none;}
+	.loadinggif {background:url('<?php echo site_url(); ?>/wp-content/plugins/transdirect-shipping/ajax-loader.gif') no-repeat right center;}
 </style>
 <h3><?php echo $this->method_title; ?></h3>
 <div style="border:1px solid #797979;  width:800px; padding:10px;">
