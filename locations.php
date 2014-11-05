@@ -5,6 +5,7 @@ if ($q != '0') {
 	curl_setopt($ch, CURLOPT_URL, "https://www.transdirect.com.au/api/locations/search?q=".$q);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 	curl_setopt($ch, CURLOPT_HEADER, FALSE);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 	$response_location = curl_exec($ch);
 	curl_close($ch);
 
