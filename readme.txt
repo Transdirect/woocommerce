@@ -3,7 +3,7 @@ Contributors: transdirect, bywave
 Tags: transdirect, quote, quotes, quick quotes, courier, couriers, freight, freights, shipping, delivery, toll, toll ipec, fastway, couriers please, toll priority, northline, mainfreight, cart, checkout, configurable, woocommerce, woo-commerce, ecommerce, e-commerce, commerce, wordpress ecommerce
 Requires at least: 3.8
 Tested up to: 4.0
-Stable tag: 1.1
+Stable tag: 1.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -21,6 +21,10 @@ The main features of this plugin are:
 * Seamless checkout process for your clients.
 * Multiple quote options.
 * Insurance options available.
+
+Requirements: 
+
+* PHP version at least 5.3.
 
 To find out more about Transdirect's service, please contact sales@transdirect.com.au.
 Transdirect - Delivering Solutions.
@@ -52,9 +56,25 @@ This section describes how to install the plugin and get it working.
 = 1.1 =
 * Added SSL verification in getting location.
 
+= 1.2 =
+* Added spinner when getting quote.
+
+= 1.3 =
+* Fix the PHP version issues.
+
+= 1.4 =
+* Fix the insurance value and error logs.
+
 == Upgrade Notice ==
 
 = 1.1 =
 * Upgrade to fix some browser SSL verification. 
 
+= 1.2 =
+* Upgrade to make indicator in getting quote.
 
+= 1.3 = 
+* Upgrade to fix PHP version issues.
+
+= 1.4 = 
+* Upgrade to fix insurance value and error logs.

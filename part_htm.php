@@ -1,26 +1,91 @@
 <style>
-	table.form-table.shipping {border-collapse:separate;}
-	table.form-table.shipping td {vertical-align:top; padding:0; border:1px solid #797979;}
-	table.form-table.shipping td.noBorder{border:none;}
-	table.form-table.shipping td table td {border:none; padding:5px; vertical-align:middle;}
-	.logoSection, .onLineFAQ, .contactSales {border:1px solid #797979;}
-	.logoSection {margin-bottom:11px; height:145px;}
-	.onLineFAQ, .contactSales { margin-bottom:11px; min-height:75px;}
+	table.form-table.shipping {
+		border-collapse:separate;
+	}
+	table.form-table.shipping td {
+		vertical-align:top; 
+		padding:0; border:1px 
+		solid #797979;
+	}
+	table.form-table.shipping td.noBorder{
+		border:none;
+	}
+	table.form-table.shipping td table td {
+		border:none; 
+		padding:5px; 
+		vertical-align:middle;
+	}
+
+	.logoSection, 
+	.onLineFAQ, 
+	.contactSales {
+		border:1px solid #797979;
+	}
+
+	.logoSection {
+		margin-bottom:11px; 
+		height:145px;
+	}
+	.onLineFAQ, 
+	.contactSales { 
+		margin-bottom:11px; 
+		min-height:75px;
+	}
 
 	@media only screen and (-webkit-min-device-pixel-ratio:2), only screen and (min-resolution:144dpi) {
-		.chosen-container .chosen-results-scroll-down span, .chosen-container .chosen-results-scroll-up span, .chosen-container-multi .chosen-choices .search-choice .search-choice-close, .chosen-container-single .chosen-search input[type=text], .chosen-container-single .chosen-single abbr, .chosen-container-single .chosen-single div b, .chosen-rtl .chosen-search input[type=text] {
+		.chosen-container .chosen-results-scroll-down span, 
+		.chosen-container .chosen-results-scroll-up span, 
+		.chosen-container-multi .chosen-choices .search-choice .search-choice-close, 
+		.chosen-container-single .chosen-search input[type=text], 
+		.chosen-container-single .chosen-single abbr, 
+		.chosen-container-single .chosen-single div b, 
+		.chosen-rtl .chosen-search input[type=text] {
 			background-image:url(../images/chosen-sprite@2x.png)!important;
 			background-size:52px 37px!important;
 			background-repeat:no-repeat!important;
 		}
 	}
 
-	.chosen-container-single .chosen-single abbr {top:8px}
+	.chosen-container-single .chosen-single abbr {
+		top:8px
+	}
 
-	#autocomplete-div {background:#FFFFFF; border: 1px solid #EDEDED; border-radius: 3px 3px 3px 3px; display: none; height: 200px;  margin: -5px 0 0 1px; overflow: auto; padding: 5px; position: absolute;  width: 189px;   z-index: 99;}
-	#autocomplete-div ul li {padding:0 !important;margin:0 !important; text-indent:0 !important;list-style: none;cursor:pointer;}
-	#autocomplete-div ul li:hover {background:#ededed;list-style: none;}
-	.loadinggif {background:url('<?php echo site_url(); ?>/wp-content/plugins/transdirect-shipping/ajax-loader.gif') no-repeat right center;}
+	#autocomplete-div {
+		background:#FFFFFF; 
+		border: 1px solid #EDEDED; 
+		border-radius: 3px 3px 3px 3px; 
+		display: none; 
+		height: auto;
+		max-height: 150px;  
+		margin: -2px 0 0 1px; 
+		overflow: auto; 
+		padding: 5px; 
+		position: absolute;  
+		width: 159px;   
+		z-index: 99;
+	}
+
+	#autocomplete-div ul {
+		margin: 0 0 0px 0px !important;
+	}
+
+	#autocomplete-div ul li {
+		padding:0 !important;
+		margin:0 !important; 
+		text-indent:0 !important;
+		list-style: none;
+		cursor:pointer;
+		border-bottom: 1px solid #f8f7f3;
+	}
+	#autocomplete-div ul li:hover {
+		background:#ededed;
+		list-style: none;
+	}
+
+	.loadinggif {
+		background:url('<?php echo site_url(); ?>/wp-content/plugins/transdirect-shipping/ajax-loader.gif') no-repeat right center;
+	}
+
 </style>
 <h3><?php echo $this->method_title; ?></h3>
 <div style="border:1px solid #797979;  width:800px; padding:10px;">
@@ -80,7 +145,8 @@
 					<tr>
 					    <td>Postcode:</td>
 					    <td>
-						    <input type="text" name="<?php echo $field; ?>postcode" id="<?php echo $field; ?>postcode" style="" value="<?php echo $default_values['postcode'];?>" placeholder="">
+						    <input type="text" name="<?php echo $field; ?>postcode" id="<?php echo $field; ?>postcode" 
+						    style="" value="<?php echo $default_values['postcode'];?>" placeholder=""  autocomplete="off">
 							<br/>
 						    <span id="loading-div" style="display:none;"></span>
 						    <div id="autocomplete-div"></div>
@@ -248,7 +314,9 @@
 
 		var latestRequestNumber = 0;
 		var globalTimeout = null;
+
 		jQuery('#woocommerce_woocommerce_transdirect_postcode').keyup(function() {
+
 			var key_val = jQuery("#woocommerce_woocommerce_transdirect_postcode").val();
 			var position = jQuery("#woocommerce_woocommerce_transdirect_postcode").position();
 			var html = '';
@@ -261,22 +329,32 @@
 
 			jQuery.getJSON("<?php echo plugins_url('locations.php' , __FILE__ ); ?>", {'q':key_val, requestNumber: ++latestRequestNumber}, function(data) {
 
-				if (data.requestNumber < latestRequestNumber) {return;}
-
+				if (data.requestNumber < latestRequestNumber) {
+					return;
+				}
 				if (data.locations != '' && key_val != '0') {
 					jQuery.each(data.locations, function(index, value ) {
 						html = html+'<li onclick="get_value(\''+value.postcode+'\',\''+value.locality+'\')">'+value.postcode+', '+value.locality+'</li>';
 					});
 
 					var main_content = '<ul id="auto_complete">'+html+'</ul>';
-
 					jQuery("#loading-div").hide();
 					jQuery("#autocomplete-div").show();
 					jQuery("#autocomplete-div").html(main_content);
 					jQuery("#autocomplete-div").css('left', position.left);
-					jQuery("#autocomplete-div").css('top', parseInt(position.top) + 38);
+					jQuery("#autocomplete-div").css('top', parseInt(position.top) + 30);
 				} else {
-					jQuery( "#autocomplete-div" ).hide();
+					// jQuery( "#autocomplete-div" ).hide();
+						html = html+'<li>No Results Found</li>';
+		                 var main_content = '<ul id="auto_complete">'+html+'</ul>';
+		               
+		                jQuery("#autocomplete-div").show();
+				        jQuery("#autocomplete-div").html(main_content);
+				        jQuery("#autocomplete-div").css('left', position.left);
+				        jQuery("#autocomplete-div").css('top', parseInt(position.top) + 30);
+				        jQuery("#autocomplete-div").css('overflow-y','hidden');
+
+				        jQuery('#woocommerce_woocommerce_transdirect_postcode').removeClass('loadinggif');
 				}
 
 				jQuery('#woocommerce_woocommerce_transdirect_postcode').removeClass('loadinggif');
@@ -289,5 +367,6 @@
 		jQuery("#autocomplete-div").html('');
 		jQuery( "#autocomplete-div" ).hide();
 	}
+	
 </script>
 

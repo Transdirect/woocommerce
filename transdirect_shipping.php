@@ -4,7 +4,7 @@
  * Plugin URI: https://www.transdirect.com.au/e-commerce/woo-commerce/
  * Description: This plugin allows you to calculate shipping as per your delivery location.
  * FAQ: https://www.transdirect.com.au/e-commerce/woo-commerce/
- * Version: 1.1
+ * Version: 1.4
  * Author: Transdirect
  * Author URI: http://transdirect.com.au/
  * Text Domain: woocommerce_transdirect
@@ -15,7 +15,6 @@
 if (!defined('ABSPATH')) exit;
 
 if (!session_id()) session_start();
-
 error_reporting(E_ALL & ~E_NOTICE);
 
 /**
@@ -36,7 +35,6 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 				public function __construct() {
 
 					$this->id = 'woocommerce_transdirect';
-
 					load_plugin_textdomain($this->id, false, dirname(plugin_basename(__FILE__)) . '/lang/');
 
 					$this->method_title	= __('Transdirect Shipping', $this->id);
@@ -308,6 +306,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 			curl_setopt($ch, CURLOPT_POST, TRUE);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($api_arr));
 			curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 			$response1 = curl_exec($ch);
 			curl_close($ch);
 			$shipping_quotes1 = json_decode(str_replace("''","0",$response1));
@@ -436,14 +435,14 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 				$i++;
 			}
 
-			$args = [
-				'headers'   => [
+			$args = array(
+				'headers'   => array(
 					'Authorization' => 'Basic ' . base64_encode($default_values['email'] . ':' . $default_values['password']),
 					'Content-Type'  => 'application/json'
-				],
+				),
 				'body'      => json_encode($api_arr),
 				'timeout'   => 45
-			];
+			);
 
 			$link = "https://www.transdirect.com.au/api/bookings";
 
@@ -455,10 +454,9 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 			$shipping_quotes = json_decode(str_replace("''", "0", $response));
 			$shipping_quotes = $shipping_quotes->quotes;
 
-			$quotes = [];
+			$quotes = array();
 
 			if ($shipping_quotes != '') {
-
 				$handling_surcharge = 0;
 				if ($default_values['surcharge'] == 'yes')
 					$handling_surcharge = number_format($default_values['surcharge_price'], 2);
@@ -472,7 +470,10 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 					$insurance_fee_html = '';
 					if ($default_values['insurance_surcharge'] == 'yes') {
 						$total_price = wc_format_decimal($total + $handling_surcharge);
-						$insurance_fee_html = $default_values['insurance_surcharge'] == 'yes' ? (' + ' . get_woocommerce_currency_symbol() . $insurance_fee . ' insurance fee') : '';
+						//$insurance_fee_html = $default_values['insurance_surcharge'] == 'yes' ? (' + ' . get_woocommerce_currency_symbol() . $insurance_fee . ' insurance fee') : '';
+
+						//addedd by ellen
+						$insurance_fee_html = $default_values['insurance_surcharge'] == 'yes' ? ('&nbsp;&nbsp;+&nbsp;&nbsp;' . get_woocommerce_currency_symbol().'&nbsp;'. $insurance_fee . '&nbsp;insurance fee') : '';
 					} else {
 						$total_price = wc_format_decimal($price_insurance_ex + $handling_surcharge);
 					}
@@ -505,7 +506,8 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 								if ($default_values['quotes'] == 'Display all Quotes') {
 
 									$quotes['couriers'][$k]['html'] = '<input type="radio" name="shipping_type_radio" class="shipping_type_radio" onclick="get_quote(\'' . $k . '\');" id="' . $k . '" value="' . $k . '" />
-										' . $courier_name . ' - ' . get_woocommerce_currency_symbol() . $price_insurance_ex . $insurance_fee_html . ' + ' . ($handling_surcharge > 0 ? $handling_surcharge . ' handling surcharge.' : '') . '<br/>
+										'.'<b>' .$courier_name . '</b>&nbsp;-&nbsp;' . get_woocommerce_currency_symbol().'&nbsp;'. $price_insurance_ex . $insurance_fee_html . ($handling_surcharge > 0 ? '&nbsp;&nbsp;+&nbsp;&nbsp;'.$handling_surcharge . ' handling surcharge.' : '') . '<br/>
+
 										<input type="hidden" name="' . $k . '_price" id="' . $k . '_price" value="' . $total_price . '" />
 										<input type="hidden" name="' . $k . '_transit_time" id="' . $k . '_transit_time" value="' . $sq->transit_time . '" />
 										<input type="hidden" name="' . $k . '_service_type" id="' . $k . '_service_type" value="' . $sq->service_type . '" />';
@@ -518,7 +520,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 										// Initialize array to remove previous values
 										$quotes['cheapest']['couriers'] = null;
 										$quotes['cheapest']['couriers'][$k] = '<input type="radio" name="shipping_type_radio" class="shipping_type_radio" onclick="get_quote(\'' . $k . '\');" id="' . $k . '" value="' . $k . '" />
-											' . $courier_name . ' - ' . get_woocommerce_currency_symbol() . $price_insurance_ex . $insurance_fee_html . ' + ' . ($handling_surcharge > 0 ? $handling_surcharge . ' handling surcharge.' : '') . '<br/>
+											'.'<b>' .$courier_name . '</b>&nbsp;-&nbsp;' . get_woocommerce_currency_symbol().'&nbsp;'. $price_insurance_ex . $insurance_fee_html . ($handling_surcharge > 0 ? '&nbsp;&nbsp;+&nbsp;&nbsp;'.$handling_surcharge . ' handling surcharge.' : '') . '<br/>
 											<input type="hidden" name="' . $k . '_price" id="' . $k . '_price" value="' . $total_price . '" />
 											<input type="hidden" name="' . $k . '_transit_time" id="' . $k . '_transit_time" value="' . $sq->transit_time . '" />
 											<input type="hidden" name="' . $k . '_service_type" id="' . $k . '_service_type" value="' . $sq->service_type . '" />';
@@ -526,7 +528,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 									} elseif ($quotes['cheapest']['price'] == $total_price || !isset($quotes['cheapest']['price'])) {
 
 										$quotes['cheapest']['couriers'][$k] = '<input type="radio" name="shipping_type_radio" class="shipping_type_radio" onclick="get_quote(\'' . $k . '\');" id="' . $k . '" value="' . $k . '" />
-											' . $courier_name . ' - ' . get_woocommerce_currency_symbol() . $price_insurance_ex . $insurance_fee_html . ' + ' . ($handling_surcharge > 0 ? $handling_surcharge . ' handling surcharge.' : '') . '<br/>
+											'.'<b>' .$courier_name . '</b>&nbsp;-&nbsp;' . get_woocommerce_currency_symbol().'&nbsp;'. $price_insurance_ex . $insurance_fee_html . ($handling_surcharge > 0 ? '&nbsp;&nbsp;+&nbsp;&nbsp;'.$handling_surcharge . ' handling surcharge.' : '') . '<br/>
 											<input type="hidden" name="' . $k . '_price" id="' . $k . '_price" value="' . $total_price . '" />
 											<input type="hidden" name="' . $k . '_transit_time" id="' . $k . '_transit_time" value="' . $sq->transit_time . '" />
 											<input type="hidden" name="' . $k . '_service_type" id="' . $k . '_service_type" value="' . $sq->service_type . '" />';
@@ -565,28 +567,43 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 				}
 			}
 
-			$html = '<span class="close-option" style="float:right;"><a href="javascript:void(0)" title="close" onclick="document.getElementById(\'shipping_type\').style.display=\'none\';">Close</a></span>';
+			$html = '<span class="close-option" style="float:right;"><a href="javascript:void(0)" title="close" 
+			onclick="document.getElementById(\'shipping_type\').style.display=\'none\';">Close</a></span>';
 
 			if ($default_values['quotes'] == 'Display all Quotes') {
-				foreach ($quotes['couriers'] as $key => $value) {
-					$html = $html . $value['html'];
+				if($quotes['couriers']){
+					foreach ($quotes['couriers'] as $key => $value) {
+						$html = $html . $value['html'];
+					}
+				} else{
+					//echo 'No data found ';
 				}
 			} elseif ($default_values['quotes'] == 'Display Cheapest') {
-				foreach ($quotes['cheapest']['couriers'] as $key => $value)
-					$html = $html . $value;
+				if($quotes['cheapest']['couriers']) {
+					foreach ($quotes['cheapest']['couriers'] as $key => $value)
+						$html = $html . $value;
+				} else {
+					//echo 'No data found';
+				}
 			} elseif ($default_values['quotes'] == 'Display Cheapest Fastest') {
-				foreach ($quotes['fastest']['couriers'] as $key => $value)
-					$html = $html . $value;
+				if($quotes['fastest']['couriers']){
+					foreach ($quotes['fastest']['couriers'] as $key => $value)
+						$html = $html . $value;
+				} else {
+					//echo 'No data found';
+				}
 			}
 
 			if($html == '' && $default_values['fixed_error'] == 'yes') {
 				$_SESSION['price'] =  $default_values['fixed_error_price'];
-				echo 'No data found';
+				//echo 'No data found';
 			}
 
-			header( "Content-Type: text/html" );
+			//header( "Content-Type: text/html" );
 
-			echo $html;
+			//echo $html;
+
+			echo "No Login provided";
 		}
 		else {
 			echo '';
