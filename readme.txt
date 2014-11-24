@@ -62,9 +62,6 @@ This section describes how to install the plugin and get it working.
 = 1.3 =
 * Fix the PHP version issues.
 
-= 1.4 =
-* Fix the insurance value and error logs.
-
 == Upgrade Notice ==
 
 = 1.1 =
@@ -75,6 +72,3 @@ This section describes how to install the plugin and get it working.
 
 = 1.3 = 
 * Upgrade to fix PHP version issues.
-
-= 1.4 = 
-* Upgrade to fix insurance value and error logs.
