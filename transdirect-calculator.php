@@ -4,7 +4,7 @@
  *
  * @author 		WooThemes
  * @package 	WooCommerce/Templates
- * @version     1.4
+ * @version     1.5
  */
  
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
