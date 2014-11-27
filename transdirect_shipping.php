@@ -5,7 +5,7 @@
  * Plugin URI: https://www.transdirect.com.au/e-commerce/woo-commerce/
  * Description: This plugin allows you to calculate shipping as per your delivery location.
  * FAQ: https://www.transdirect.com.au/e-commerce/woo-commerce/
- * Version: 1.3
+ * Version: 1.6
  * Author: Transdirect
  * Author URI: http://transdirect.com.au/
  * Text Domain: woocommerce_transdirect
@@ -15,6 +15,7 @@
 
 // Exit if accessed directly
 if (!defined('ABSPATH')) exit;
+
 
 if (!session_id()) session_start();
 error_reporting(E_ALL & ~E_NOTICE);

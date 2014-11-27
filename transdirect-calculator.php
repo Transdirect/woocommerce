@@ -9,6 +9,7 @@
  
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
+
 global $woocommerce, $wpdb; ?>
 
 <style>
