@@ -1,5 +1,4 @@
 function validate(plugin_url) {
-
 	if (document.getElementById('to_location').value == '') {
         alert("Please select a delivery location.");     
 		return false;
@@ -65,8 +64,10 @@ function get_quote(name) {
 
         },
         function(response) {
+            console.log(response);
             jQuery('#trans_frm').removeClass('load');
             window.location.reload();
         }
     );
 }
+

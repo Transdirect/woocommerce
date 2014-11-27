@@ -3,7 +3,7 @@ Contributors: transdirect, bywave
 Tags: transdirect, quote, quotes, quick quotes, courier, couriers, freight, freights, shipping, delivery, toll, toll ipec, fastway, couriers please, toll priority, northline, mainfreight, cart, checkout, configurable, woocommerce, woo-commerce, ecommerce, e-commerce, commerce, wordpress ecommerce
 Requires at least: 3.8
 Tested up to: 4.0
-Stable tag: 1.5
+Stable tag: 1.6
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -68,6 +68,9 @@ This section describes how to install the plugin and get it working.
 = 1.5 =
 * Fix insurance value and error logs.
 
+= 1.6 =
+* Fix display of quotes and sort quotes from cheapest to expensive.
+
 == Upgrade Notice ==
 
 = 1.1 =
@@ -84,3 +87,6 @@ This section describes how to install the plugin and get it working.
 
 = 1.5 =
 * Upgrade to fix insurance value and error logs.
+
+= 1.6 =
+* Upgrade display of quotes and sort quotes from cheapest to expensive.

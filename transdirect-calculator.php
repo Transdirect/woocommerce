@@ -4,7 +4,7 @@
  *
  * @author 		WooThemes
  * @package 	WooCommerce/Templates
- * @version     1.5
+ * @version     1.6
  */
  
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
@@ -622,7 +622,8 @@ if (WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect') {
 </script>
 
 
-<?php if (WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect' && !isset($_SESSION['price'])) {
+<?php if (WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect') {
+	//if (WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect' && !isset($_SESSION['price'])) {
 	// Default settings
 		// var_dump(WC()->session);
 	// var_dump(WC()->session->total);
@@ -656,8 +657,8 @@ if (WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect') {
 
 			<?php if ($default_values['insurance_surcharge'] == 'yes') { ?>
 				<p class="form-row form-row-small">
-					<?php echo '<b>'.get_woocommerce_currency_symbol().''.number_format(WC()->session->total, 2).'</b>' ?>
-					<!-- <input type="text" name="insurance_value" id="insurance_value" value="" placeholder="Insurance Value"/> -->
+					<?php //echo '<b>'.get_woocommerce_currency_symbol().''.number_format(WC()->session->total, 2).'</b>' ?>
+					<input type="text" name="insurance_value" id="insurance_value" value="" placeholder="Declared Value"/>
 				</p>
 			<?php } ?>
 
