@@ -60,33 +60,33 @@ This section describes how to install the plugin and get it working.
 * Added spinner when getting quote.
 
 = 1.3 =
-* Fix the PHP version issues.
+* Fixed the PHP version issues.
 
 = 1.4 =
-* Fix the decimal 2 decimals in couriers.
+* Fixed the decimal 2 decimals in couriers.
 
 = 1.5 =
-* Fix insurance value and error logs.
+* Fixed insurance value and error logs.
 
 = 1.6 =
-* Fix display of quotes and sort quotes from cheapest to expensive.
+* Fixed display of quotes and sort quotes from cheapest to expensive.
 
 == Upgrade Notice ==
 
 = 1.1 =
-* Upgrade to fix some browser SSL verification. 
+* Upgraded to fix some browser SSL verification. 
 
 = 1.2 =
-* Upgrade to make indicator in getting quote.
+* Upgraded to make indicator in getting quote.
 
 = 1.3 = 
-* Upgrade to fix PHP version issues.
+* Upgraded to fix PHP version issues.
 
 = 1.4 = 
-* Upgrade to fix the decimal 2 decimals in couriers.
+* Upgraded to fix the decimal 2 decimals in couriers.
 
 = 1.5 =
-* Upgrade to fix insurance value and error logs.
+* Upgraded to fix insurance value and error logs.
 
 = 1.6 =
-* Upgrade display of quotes and sort quotes from cheapest to expensive.
+* Upgraded display of quotes and sort quotes from cheapest to expensive.
