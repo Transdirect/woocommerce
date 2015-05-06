@@ -4,11 +4,10 @@
  *
  * @author 		WooThemes
  * @package 	WooCommerce/Templates
- * @version     1.6
+ * @version     1.7
  */
  
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
-
 
 global $woocommerce, $wpdb; ?>
 
@@ -125,7 +124,7 @@ global $woocommerce, $wpdb; ?>
 
 <?php if (!empty($_POST['shipping_variation']))	{
 
-	$shipping_details = $wpdb->get_results( "SELECT `option_value` FROM `wp_options` WHERE `option_name`='woocommerce_".WC()->session->chosen_shipping_methods[0]."_settings'");
+	$shipping_details = $wpdb->get_results( "SELECT `option_value` FROM " . $wpdb->prefix . "options WHERE `option_name`='woocommerce_".WC()->session->chosen_shipping_methods[0]."_settings'");
 
 	$default_values = unserialize($shipping_details[0]->option_value);
 
@@ -141,7 +140,8 @@ global $woocommerce, $wpdb; ?>
 	}
 }
 
-if (isset($_SESSION['price']) && WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect') {
+if (isset($_SESSION['price']) && 
+	WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect') {
 
 	$price = $_SESSION['price'];
 
@@ -160,7 +160,7 @@ if (!empty($_POST['to_location'])) {
 	if(!empty(WC()->session->chosen_shipping_methods[0]))
 	{
 		// Default settings
-		$shipping_details = $wpdb->get_results("SELECT `option_value` FROM `wp_options` WHERE `option_name`='woocommerce_".WC()->session->chosen_shipping_methods[0]."_settings'");
+		$shipping_details = $wpdb->get_results("SELECT `option_value` FROM " . $wpdb->prefix . "options WHERE `option_name`='woocommerce_".WC()->session->chosen_shipping_methods[0]."_settings'");
 		$default_values = unserialize($shipping_details[0]->option_value);
 		
 		$api_arr = '';
@@ -225,10 +225,10 @@ if (!empty($_POST['to_location'])) {
 
 if (WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect') {
 
-	if(!isset($_SESSION['price']) || $_SESSION['price'] == '' || $_SESSION['price'] == 0) { ?>
+	if(!isset($_SESSION['price']) || $_SESSION['price'] == '' 
+		|| $_SESSION['price'] == 0) { ?>
 
 		<style> #place_order {display : none !important;} </style>
-
 		<script>
 			jQuery('#place_order').attr('disabled','disabled');
 		</script>
@@ -238,9 +238,7 @@ if (WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect') {
 	<style> form.shipping_calculator {display : none !important;} </style>
 
 	<script>
-
-
-
+	
 		function hideContent() {
 			jQuery("#autocomplete-div").html('');
 			jQuery("#autocomplete-div").hide();
@@ -327,310 +325,14 @@ if (WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect') {
 		jQuery("#dynamic_content").remove();
 	}
 
-
-	jQuery(document).ready(function() {
-	// 	var latestRequestNumber1 = 0;
-
-	// 	jQuery('#billing_city').keyup(function() {
-
-	// 		jQuery('#billing_city').addClass('loadinggif');
-
-	// 		var key_val = jQuery('#billing_city').val();
-	// 		var key_id = jQuery('#billing_city').attr('id');
-	// 		var position = jQuery('#billing_city').position();
-
-	// 		var html = '';
-	// 		var content_type = '';
-
-	// 		if (key_id == 'billing_city') {
-	// 			content_type = 'text';
-	// 		}
-
-	// 		if (key_val == '') {
-	// 			jQuery('#billing_city').removeClass('loadinggif');
-	// 			key_val = 0;
-	// 		}
-
-	// 		jQuery.getJSON("<?php echo plugins_url('locations.php' ,__FILE__); ?>",{'q':key_val,requestNumber: ++latestRequestNumber1}, function(data) {
-
-	// 			if (data.requestNumber < latestRequestNumber1) {
-	// 				return;
-	// 			}
-
-	// 			if(data.locations != '' && key_val != '0') {
-	// 				jQuery(".woocommerce-billing-fields").css('position', 'relative');
-
-	// 				jQuery.each(data.locations, function(index, value) {
-	// 					if (content_type == 'text') {
-	// 						html = html + '<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
-	// 					} else {
-	// 						html = html + '<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+'</li>';
-	// 					}
-	// 				});
-
-	// 				var top_cal = parseInt(position.top) + 40;
-
-	// 				var main_content = '<div id="dynamic_content" style="cursor:pointer;overflow: auto;background-color:#FFFFFF;z-index:1000; position: absolute;  width: 189px;height: 200px; top:'+position.top_cal+'px;"><ul >'+html+'</ul></div>';
-
-	// 				jQuery("#"+key_id+"_field").append(main_content);
-	// 				jQuery('#billing_city').removeClass('loadinggif');
-	// 			} else {
-	// 				jQuery("#dynamic_content").remove();
-	// 				jQuery('#billing_city').removeClass('loadinggif');
-	// 			}
-	// 		});
-	// 	});
-
-		// var latestRequestNumber2 = 0;
-
-		// jQuery('#billing_state').keyup(function() {
-		// 	jQuery('#billing_state').addClass('loadinggif');
-
-		// 	var key_val = jQuery("#billing_state").val();
-		// 	var key_id = jQuery("#billing_state").attr('id');
-		// 	var position = jQuery("#billing_state").position();
-
-		// 	var html = '';
-		// 	var content_type = '';
-
-		// 	if (key_id == 'billing_state') {
-		// 		content_type = 'text';
-		// 	}
-				 
-		// 	if (key_val == '') {
-		// 		jQuery('#billing_state').removeClass('loadinggif');
-		// 		key_val =0;
-		// 	}
-
-		// 	jQuery.getJSON("<?php echo plugins_url('locations.php', __FILE__); ?>",{'q':key_val,requestNumber: ++latestRequestNumber2}, function(data) {
-					 
-		// 		if (data.requestNumber < latestRequestNumber2) {return;}
-
-		// 		if(data.locations!='' && key_val!=0) {
-		// 			jQuery(".woocommerce-billing-fields").css('position', 'relative');
-
-		// 			jQuery.each(data.locations, function(index, value) {
-		// 				if (content_type=='text') {
-		// 					html = html + '<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
-		// 				} else {
-		// 					html = html + '<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+'</li>';
-		// 				}
-		// 			});
-
-		// 			var top_cal = parseInt(position.top) + 40;
-
-		// 			var main_content = '<div id="dynamic_content" style="cursor:pointer;overflow: auto;background-color:#FFFFFF;z-index:1000; position: absolute;  width: 189px;height: 200px; top:'+position.top_cal+'px;"><ul >'+html+'</ul></div>';
-
-		// 			jQuery("#" + key_id + "_field").append(main_content);
-		// 			jQuery('#billing_state').removeClass('loadinggif');
-		// 		} else {
-		// 			jQuery("#dynamic_content").remove();
-		// 			jQuery('#billing_state').removeClass('loadinggif');
-		// 		}
-		// 	});
-		// });
-			
-		// var latestRequestNumber3 = 0;
-
-		// jQuery('#billing_postcode').keyup(function() {
-		// 	jQuery('#billing_postcode').addClass('loadinggif');
-
-		// 	var key_val = jQuery("#billing_postcode").val();
-		// 	var key_id = jQuery("#billing_postcode").attr('id');
-		// 	var position = jQuery("#billing_postcode").position();
-
-		// 	var html = '';
-		// 	var content_type = '';
-
-		// 	if (key_id == 'billing_postcode') {
-		// 		content_type = 'numeric';
-		// 	}
-
-		// 	if (key_val == '') {
-		// 		jQuery('#billing_postcode').removeClass('loadinggif');
-		// 		key_val = 0;
-		// 	}
-
-		// 	jQuery.getJSON("<?php echo plugins_url('locations.php' , __FILE__); ?>",{'q':key_val,requestNumber: ++latestRequestNumber3}, function(data) {
-					 
-		// 		if (data.requestNumber < latestRequestNumber3) {return;}
-
-		// 		if (data.locations != '' && key_val != 0) {
-		// 			jQuery(".woocommerce-billing-fields").css('position', 'relative');
-
-		// 			jQuery.each(data.locations, function(index, value) {
-		// 				 if (content_type=='text') {
-		// 					 html = html + '<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
-		// 				 } else {
-		// 					 html = html + '<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+' , '+value.locality+'</li>';
-		// 				 }
-		// 			});
-
-		// 			var top_cal = parseInt(position.top) + 40;
-		// 			var main_content = '<div id="dynamic_content" style="cursor:pointer;overflow: auto;background-color:#FFFFFF;z-index:1000; position: absolute;  width: 189px;height: 200px; top:'+position.top_cal+'px;"><ul >'+html+'</ul></div>';
-							 
-		// 			jQuery("#"+key_id+"_field").append(main_content);
-		// 			jQuery('#billing_postcode').removeClass('loadinggif');
-		// 		} else {
-		// 			jQuery("#dynamic_content").remove();
-		// 			jQuery('#billing_postcode').removeClass('loadinggif');
-		// 		}
-		// 	});
-		// });
-			
-		// var latestRequestNumber4 = 0;
-
-		// jQuery('#shipping_city').keyup(function() {
-		// 	jQuery('#shipping_city').addClass('loadinggif');
-
-		// 	var key_val = jQuery("#shipping_city").val();
-		// 	var key_id = jQuery("#shipping_city").attr('id');
-		// 	var position = jQuery( "#shipping_city" ).position();
-
-		// 	var html = '';
-		// 	var content_type = '';
-
-		// 	if (key_id == 'shipping_city') {
-		// 		content_type = 'text';
-		// 	}
-
-		// 	if (key_val == '') {
-		// 		jQuery('#shipping_city').removeClass('loadinggif');
-		// 		key_val = 0;
-		// 	}
-				 
-		// 	jQuery.getJSON("<?php echo plugins_url('locations.php' ,__FILE__ ); ?>",{'q':key_val,requestNumber: ++latestRequestNumber4}, function(data) {
-					 
-		// 		if (data.requestNumber < latestRequestNumber4) {return;}
-
-		// 		if (data.locations != '' && key_val != 0) {
-		// 			jQuery( ".woocommerce-shipping-fields" ).css('position', 'relative');
-
-		// 			jQuery.each(data.locations, function(index, value) {
-		// 				if (content_type=='text') {
-		// 					html = html + '<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
-		// 				} else {
-		// 					html = html + '<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+'</li>';
-		// 				}
-		// 			});
-
-		// 			var top_cal = parseInt(position.top) + 40;
-		// 			var main_content = '<div id="dynamic_content" style="cursor:pointer;overflow: auto;background-color:#FFFFFF;z-index:1000; position: absolute;  width: 189px;height: 200px; top:'+position.top_cal+'px;"><ul >'+html+'</ul></div>';
-
-		// 			jQuery("#" + key_id + "_field").append(main_content);
-		// 			jQuery('#shipping_city').removeClass('loadinggif');
-		// 		} else {
-		// 			jQuery("#dynamic_content").remove();
-		// 			jQuery('#shipping_city').removeClass('loadinggif');
-		// 		}
-		// 	});
-		// });
-			
-		// var latestRequestNumber5 = 0;
-
-		// jQuery('#shipping_state').keyup(function() {
-		//     jQuery('#shipping_state').addClass('loadinggif');
-
-		// 	var key_val = jQuery( "#shipping_state" ).val();
-		// 	var key_id = jQuery( "#shipping_state" ).attr('id');
-		// 	var position = jQuery( "#shipping_state" ).position();
-
-		// 	var html = '';
-		// 	var content_type = '';
-		// 	if (key_id == 'shipping_state') {
-		// 		 content_type = 'text';
-		// 	}
-
-		// 	if (key_val == '') {
-		// 		jQuery('#shipping_state').removeClass('loadinggif');
-		// 		key_val = 0;
-		// 	}
-
-		// 	jQuery.getJSON("<?php echo plugins_url('locations.php' , __FILE__); ?>",{'q':key_val,requestNumber: ++latestRequestNumber5}, function(data) {
-		// 		if (data.requestNumber < latestRequestNumber5)  {return;}
-
-		// 		if(data.locations != '' && key_val != 0) {
-		// 			jQuery(".woocommerce-shipping-fields").css('position', 'relative');
-
-		// 			jQuery.each(data.locations, function(index, value) {
-		// 			    if (content_type == 'text') {
-		// 				    html = html + '<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
-		// 			    } else {
-		// 				    html = html + '<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+'</li>';
-		// 			    }
-		// 			});
-
-		// 			var top_cal = parseInt(position.top) + 40;
-
-		// 			var main_content = '<div id="dynamic_content" style="cursor:pointer;overflow: auto;background-color:#FFFFFF;z-index:1000; position: absolute;  width: 189px;height: 200px; top:'+position.top_cal+'px;"><ul >'+html+'</ul></div>';
-
-		// 			jQuery("#" + key_id + "_field").append(main_content);
-		// 			jQuery('#shipping_state').removeClass('loadinggif');
-		// 		} else {
-		// 		    jQuery("#dynamic_content").remove();
-		// 		    jQuery('#shipping_state').removeClass('loadinggif');
-		// 		}
-		// 	});
-		// });
-			
-		// var latestRequestNumber6 = 0;
-
-		// jQuery('#shipping_postcode').keyup(function() {
-		// 	jQuery('#shipping_postcode').addClass('loadinggif');
-
-		// 	var key_val = jQuery("#shipping_postcode").val();
-		// 	var key_id = jQuery("#shipping_postcode").attr('id');
-		// 	var position = jQuery("#shipping_postcode").position();
-
-		// 	var html = '';
-		// 	var content_type = '';
-
-		// 	if (key_id == 'shipping_postcode') {
-		// 		content_type = 'numeric';
-		// 	}
-
-		// 	if (key_val == '') {
-		// 		jQuery('#shipping_postcode').removeClass('loadinggif');
-		// 		key_val = 0;
-		// 	}
-
-		// 	jQuery.getJSON("<?php echo plugins_url('locations.php' , __FILE__); ?>",{'q':key_val,requestNumber: ++latestRequestNumber6}, function(data) {
-		// 		if (data.requestNumber < latestRequestNumber6)  {return;}
-
-		// 		if(data.locations != '' && key_val != 0) {
-		// 		    jQuery(".woocommerce-shipping-fields").css('position', 'relative');
-
-		// 			jQuery.each(data.locations, function(index, value) {
-		// 			    if (content_type=='text') {
-		// 				    html = html + '<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.locality+'\')">'+value.locality+'</li>';
-		// 			    } else {
-		// 				    html = html + '<li style="list-style: none;margin:0;padding:0;" onclick="get_dynamic_value(\''+key_id+'\',\''+value.postcode+'\')">'+value.postcode+' , '+value.locality+'</li>';
-		// 			    }
-		// 			});
-
-		// 			var top_cal = parseInt(position.top) + 40;
-		// 			var main_content = '<div id="dynamic_content" style="cursor:pointer;overflow: auto;background-color:#FFFFFF;z-index:1000; position: absolute;  width: 189px;height: 200px; top:'+position.top_cal+'px;"><ul >'+html+'</ul></div>';
-
-		// 			jQuery("#" + key_id + "_field").append(main_content);
-		// 			jQuery('#shipping_postcode').removeClass('loadinggif');
-		// 		} else {
-		// 		    jQuery("#dynamic_content").remove();
-		// 		    jQuery('#shipping_postcode').removeClass('loadinggif');
-		// 		}
-		// 	});
-		// });
-	});
 </script>
 
 
 <?php if (WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect') {
 	//if (WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect' && !isset($_SESSION['price'])) {
 	// Default settings
-		// var_dump(WC()->session);
-	// var_dump(WC()->session->total);
-	// var_dump(get_woocommerce_currency_symbol());
 	$shipping_details = $wpdb
-		->get_results("SELECT `option_value` FROM `wp_options` WHERE `option_name`='woocommerce_".WC()
+		->get_results("SELECT `option_value` FROM " . $wpdb->prefix . "options WHERE `option_name`='woocommerce_".WC()
 		->session
 		->chosen_shipping_methods[0]."_settings'");
 
@@ -644,7 +346,8 @@ if (WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect') {
 		<section class="shipping-calculator-form1">
 
 			<p class="form-row form-row-wide">
-				<input type="text" name="to_location" id="to_location" value="" placeholder="Delivery Location"
+				<input type="text" name="to_location" id="to_location" value="" 
+				placeholder="Delivery Location"
 				autocomplete="off"/>
 				<br/>
 				<span id="loading-div" style="display:none;"></span>
@@ -652,14 +355,17 @@ if (WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect') {
 			</p>
 
 			<p class="form-row form-row-wide">
-				<input type="radio" name="to_type" id="business" value="business" checked/> Commercial
-				<input type="radio" name="to_type" id="residential" value="residential"/> Residential
+				<input type="radio" name="to_type" id="business" 
+				value="business" checked/> Commercial
+				<input type="radio" name="to_type" id="residential" 
+				value="residential"/> Residential
 			</p>
 
 			<?php if ($default_values['insurance_surcharge'] == 'yes') { ?>
 				<p class="form-row form-row-small">
 					<?php //echo '<b>'.get_woocommerce_currency_symbol().''.number_format(WC()->session->total, 2).'</b>' ?>
-					<input type="text" name="insurance_value" id="insurance_value" value="" placeholder="Declared Value"/>
+					<input type="text" name="insurance_value"
+					id="insurance_value" value="" placeholder="Declared Value"/>
 				</p>
 			<?php } ?>
 

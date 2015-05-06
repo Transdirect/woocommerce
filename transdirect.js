@@ -1,9 +1,12 @@
 function validate(plugin_url) {
+
 	if (document.getElementById('to_location').value == '') {
         alert("Please select a delivery location.");     
 		return false;
 
-	} else if (document.getElementById('business').value == '' || document.getElementById('residential').value == '') {
+	} else if (document.getElementById('business').value == '' 
+        || document.getElementById('residential').value == '') {
+       
         alert("Please select a delivery type");
 		return false;
 
@@ -41,13 +44,19 @@ function validate(plugin_url) {
 
 function get_quote(name) {
 
+    console.log(name);
+
 	var shipping_name = name;
 
+    console.log(jQuery("#" + name + "_price"));
 	var shipping_price = jQuery("#" + name + "_price").val();
+
+    console.log(shipping_price);
 
 	var shipping_transit_time = jQuery("#" + name + "_transit_time").val();
 	var shipping_service_type = jQuery("#" + name + "_service_type").val();
     jQuery('#trans_frm').addClass('load');
+
 	jQuery.post(
         // see tip #1 for how we declare global javascript variables
         MyAjax.ajaxurl, {
@@ -64,7 +73,6 @@ function get_quote(name) {
 
         },
         function(response) {
-            console.log(response);
             jQuery('#trans_frm').removeClass('load');
             window.location.reload();
         }
