@@ -1,17 +1,12 @@
-function validate(plugin_url) {
-
+function validate(plugin_url) {        
 	if (document.getElementById('to_location').value == '') {
         alert("Please select a delivery location.");     
 		return false;
-
 	} else if (document.getElementById('business').value == '' 
         || document.getElementById('residential').value == '') {
-       
         alert("Please select a delivery type");
 		return false;
-
 	} else {
-        
         jQuery("button[name='calc_shipping']").attr('disabled', 'disabled');
         jQuery('#trans_frm').addClass('load');
         
@@ -26,11 +21,10 @@ function validate(plugin_url) {
                 // other parameters can be added along with "action"
                 'to_location'       : document.getElementById('to_location').value,
                 'to_type'           : document.getElementById('business').checked ? 
-                                    document.getElementById('business').value : document.getElementById('residential').value,
+                                      document.getElementById('business').value : document.getElementById('residential').value,
                 'insurance_value'   : document.getElementById('insurance_value') ? 
                                       document.getElementById('insurance_value').value : 0
             }, function(response) {
-
                 jQuery("button[name='calc_shipping']").removeAttr('disabled');                
                 jQuery("#shipping_type").html('');
                 jQuery("#shipping_type").append(response);
@@ -42,16 +36,10 @@ function validate(plugin_url) {
 	}
 }
 
+
 function get_quote(name) {
-
-    console.log(name);
-
 	var shipping_name = name;
-
-    console.log(jQuery("#" + name + "_price"));
 	var shipping_price = jQuery("#" + name + "_price").val();
-
-    console.log(shipping_price);
 
 	var shipping_transit_time = jQuery("#" + name + "_transit_time").val();
 	var shipping_service_type = jQuery("#" + name + "_service_type").val();
@@ -62,7 +50,7 @@ function get_quote(name) {
         MyAjax.ajaxurl, {
             // here we declare the parameters to send along with the request
             // this means the following action hooks will be fired:
-            // wp_ajax_nopriv_myajax-submit and wp_ajax_myajax-submit
+            // wp_ajax_nopriv_myajax-subcmit and wp_ajax_myajax-submit
             action : 'myajaxdb-submit',
                 
             // other parameters can be added along with "action"
@@ -74,8 +62,13 @@ function get_quote(name) {
         },
         function(response) {
             jQuery('#trans_frm').removeClass('load');
-            window.location.reload();
+            window.location.reload();   
         }
     );
 }
+
+function showCalc() {
+    jQuery('.shipping_calculator').slideToggle();
+}
+
 

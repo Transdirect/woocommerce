@@ -3,7 +3,7 @@ Contributors: transdirect, bywave
 Tags: transdirect, quote, quotes, quick quotes, courier, couriers, freight, freights, shipping, delivery, toll, toll ipec, fastway, couriers please, toll priority, northline, mainfreight, cart, checkout, configurable, woocommerce, woo-commerce, ecommerce, e-commerce, commerce, wordpress ecommerce
 Requires at least: 3.8
 Tested up to: 4.2
-Stable tag: 1.7
+Stable tag: 1.8
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -21,6 +21,8 @@ The main features of this plugin are:
 * Seamless checkout process for your clients.
 * Multiple quote options.
 * Insurance options available.
+* Box Sizing
+* Order Sync Functionality
 
 Requirements: 
 
@@ -60,36 +62,42 @@ This section describes how to install the plugin and get it working.
 * Added spinner when getting quote.
 
 = 1.3 =
-* Fixed the PHP version issues.
+* Fix the PHP version issues.
 
 = 1.4 =
-* Fixed the decimal 2 decimals in couriers.
+* Fix the decimal 2 decimals in couriers.
 
 = 1.5 =
-* Fixed insurance value and error logs.
+* Fix insurance value and error logs.
 
 = 1.6 =
-* Fixed display of quotes and sort quotes from cheapest to expensive.
+* Fix display of quotes and sort quotes from cheapest to expensive.
 
 == Upgrade Notice ==
 
 = 1.1 =
-* Upgraded to fix some browser SSL verification. 
+* Upgrade to fix some browser SSL verification. 
 
 = 1.2 =
-* Upgraded to make indicator in getting quote.
+* Upgrade to make indicator in getting quote.
 
 = 1.3 = 
-* Upgraded to fix PHP version issues.
+* Upgrade to fix PHP version issues.
 
 = 1.4 = 
-* Upgraded to fix the decimal 2 decimals in couriers.
+* Upgrade to fix the decimal 2 decimals in couriers.
 
 = 1.5 =
-* Upgraded to fix insurance value and error logs.
+* Upgrade to fix insurance value and error logs.
 
 = 1.6 =
-* Upgraded display of quotes and sort quotes from cheapest to expensive.
+* Upgrade display of quotes and sort quotes from cheapest to expensive.
 
 = 1.7 =
-* Upgraded to read dynamic database prefix.
+* Upgrade to read dynamic database prefix.
+
+= 1.8 =
+* Added order synnc functionality and box sizing.
+* Rename/Group a courier
+* Fix bugs getting a quote and saves shipping cost.
+

@@ -14,9 +14,11 @@ if ($q != '0') {
 
 	$response_location = json_encode($locations);
 	echo $response_location;
+
 } else {
 	$locations['requestNumber'] = $_REQUEST['requestNumber'];
 	$locations['locations'] = '';
 	$response_location = json_encode($locations);
 	echo $response_location;
+	
 } ?>
