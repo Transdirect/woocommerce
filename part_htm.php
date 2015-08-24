@@ -3,7 +3,7 @@
  * Shipping Transdirect Settings
  *
  * @author 		Transdirect Developer
- * @version     1.8
+ * @version     1.9
  */
 ?>
 
@@ -25,7 +25,11 @@
 		padding:5px; 
 		vertical-align:middle;
 	}
-	
+
+	.form-table th {
+		width: 0px !important;
+	}
+
 	table.courier-name {
 		border-collapse: collapse !important;
 	}
@@ -247,7 +251,11 @@
 	}	
 
 	input.quotes_display {
-		width: 100px;
+		width:70px;
+	}
+
+	input.quotes_display_rename {
+		width: 120px;
 	}
 
 	.quote-options {
@@ -265,6 +273,10 @@
 		margin-left: 5px;
 	}
 
+	.header-style-services {
+		left: 15px;
+	}
+
 	.header-style-enabled {
 		width:50px;
 		left:10px;
@@ -280,6 +292,11 @@
 		margin-left:10px !important;
 	}
 
+	.include_surcharge_container {
+		display: inline-flex;
+		display: -webkit-inline-flex;
+		display: -ms-inline-flexbox;
+	}
 	@media only screen and (-webkit-min-device-pixel-ratio:2), only screen and (min-resolution:144dpi) {
 		.chosen-container .chosen-results-scroll-down span, 
 		.chosen-container .chosen-results-scroll-up span, 
@@ -650,8 +667,8 @@
 							 class="quote-options" value="<?php echo $default_values['surcharge_price']; ?>">
 							
 							<select class="select " name="<?php echo $field; ?>unit" id="<?php echo $field; ?>unit">
-								<option value="%" <?php if($default_values['unit']=='%'): ?> selected="selected"<?php endif; ?> >%</option>
 								<option value="$" <?php if($default_values['unit']=='$'): ?> selected="selected"<?php endif; ?>>$</option>
+								<option value="%" <?php if($default_values['unit']=='%'): ?> selected="selected"<?php endif; ?> >%</option>
 							</select>
 						</td>
 					</tr>
@@ -689,7 +706,7 @@
 									<th class="header-style-courier">
 										Courier	
 									</th>
-									<th>
+									<th class="header-style-services">
 										Service	
 									</th>
 									<th class="header-style-rename">
@@ -698,10 +715,10 @@
 									</th>
 									<th class="header-style-surcharge">
 										Surcharge
-										<select style="margin-top:-4px;" class="select " name="<?php echo $field; ?>courier_unit" id="<?php echo $field; ?>courier_unit">
-											<option value="%" <?php if($default_values['courier_unit']=='%'): ?> selected="selected"<?php endif; ?> >%</option>
-											<option value="$" <?php if($default_values['courier_unit']=='$'): ?> selected="selected"<?php endif; ?>>$</option>
-										</select>
+										<!-- <select style="margin-top:-4px;" class="select " name="<?php //echo $field; ?>courier_unit" id="<?php// echo $field; ?>courier_unit">
+											<option value="%" <?php //if($default_values['courier_unit']=='%'): ?> selected="selected"<?php// endif; ?> >%</option>
+											<option value="$" <?php //if($default_values['courier_unit']=='$'): ?> selected="selected"<?php //endif; ?>>$</option>
+										</select> -->
 									</th>
 									<th class="header-style-insurance">
 										Insurance <input class="include_surcharge_courier" type="checkbox" onclick="selectAllInsurance()" value="yes"
@@ -709,38 +726,53 @@
 										<?php if ($default_values['include_surcharge_courier'] == 'yes') : ?>checked="checked"<?php endif; ?>>
 									</th>
 								</tr>
-								<?php global $couriers_name; $x = 0;
-										foreach ($couriers_name as $courier => $value): ?>
-										<tr>
-											<td>
-												<input type="checkbox" name="<?php echo $field .'courier_'. $courier; ?>" 
-												id="<?php echo $field; ?>courier[]" class="enable_courier" value="yes" onchange="selectCourier()"
-												<?php if ($default_values['courier_'. $courier] == 'yes') : ?>checked="checked" <?php endif; ?>>
-											</td>
-											<td>
-												<?php echo $value['name']; ?>
-											</td>
-											<td>
-												<?php echo $value['services']; ?>
-											</td>
-											<td>	
-												<input type="text" name="<?php echo $field .'rename_group_'. $courier; ?>" 
-												id="<?php echo $field .'rename_group_'. $courier; ?>" class="quotes_display"
-				                        		value="<?php echo $default_values['rename_group_'.$courier]; ?>">
-											</td>
-											<td>
-												<input type="number" name="<?php echo $field .'courier_surcharge_'. $courier; ?>" 
-												id="<?php echo $field .'courier_surcharge_'. $courier; ?>" class="quotes_display"
-				                        		value="<?php echo $default_values['courier_surcharge_'. $courier]; ?>" >
-											</td>
-											<td>
-												<input class="enable-insurance" type="checkbox" name="<?php echo $field .'enabled_surcharge_'. $courier; ?>"
-												id="<?php echo $field; ?>enabled_surcharge[]" value="yes" onchange="selectInsurance()" 
-												<?php if ($default_values['enabled_surcharge_'.$courier] == 'yes') { ?>checked="checked" <?php } ?>>
-											</td>
-										</tr>
-									<?php $x++; endforeach; 
-								?>
+									<?php foreach ($couriers_name as $courier => $value): ?>
+										<?php
+											$services = $value;
+											if (gettype($value) == 'string') {
+												$services = new stdClass();
+												$services->{$courier} = $value;
+											}
+										?>
+										<?php foreach ($services as $key => $services): ?>
+											<tr>
+												<td>
+													<input type="checkbox" name="<?php echo $field .'courier_'. $services; ?>" 
+													id="<?php echo $field; ?>value[]" class="enable_courier" value="yes" onchange="selectCourier()"
+													<?php if ($default_values['courier_'. $services] == 'yes' || $default_values['courier_'. $services] == '') : ?>checked="checked" <?php endif; ?>>
+												</td>
+												<td>
+													<?php echo $courier; ?>
+												</td>
+												<td>
+													<?php echo gettype($value) == 'string' ? '' : $key; ?>
+												</td>
+												<td>	
+													<input type="text" name="<?php echo $field .'rename_group_'. $services; ?>" 
+													id="<?php echo $field .'rename_group_'. $services; ?>" class="quotes_display_rename"
+					                        		value="<?php echo $default_values['rename_group_'.$services]; ?>">
+												</td>
+												<td>
+													<div class="include_surcharge_container">
+														<input type="number" name="<?php echo $field .'courier_surcharge_'. $services; ?>" 
+														id="<?php echo $field .'courier_surcharge_'. $services; ?>" class="quotes_display"
+						                        		value="<?php echo $default_values['courier_surcharge_'. $services]; ?>" >
+
+						                        		<select class="select " name="<?php echo $field .'corunit_'. $services; ?>" id="<?php echo $field .'corunit_'. $services; ?>">
+															<option value="$" <?php if($default_values['corunit_'. $services]=='$'): ?> selected="selected"<?php endif; ?>>$</option>
+															<option value="%" <?php if($default_values['corunit_'. $services]=='%'): ?> selected="selected"<?php endif; ?> >%</option>
+														</select>
+													</div>
+												</td>
+												<td>
+													<input class="enable-insurance" type="checkbox" name="<?php echo $field .'enabled_surcharge_'. $services; ?>"
+													id="<?php echo $field; ?>enabled_surcharge[]" value="yes" onchange="selectInsurance()" 
+													<?php if ($default_values['enabled_surcharge_'.$services] == 'yes') { ?>checked="checked" <?php } ?>>
+												</td>
+											</tr>
+										<?php endforeach;?>
+												
+									<?php endforeach; ?>
 							</table>
 						</td>
                 	</tr>
@@ -795,6 +827,7 @@
 			jQuery('.autocomplete-div').hide('');
 			jQuery('#dynamic_content').hide('');
 		});
+
 
 		jQuery('.order .order-status-sync').on('click', function(e) {    
 			jQuery('.from-address input[type="text"]').each(function() {

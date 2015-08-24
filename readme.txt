@@ -101,3 +101,9 @@ This section describes how to install the plugin and get it working.
 * Rename/Group a courier
 * Fix bugs getting a quote and saves shipping cost.
 
+= 1.9 =
+* Added api for getting list of couriers.
+* Change units of surcharge per courier.
+* Change courier name and services.
+
+

@@ -4,7 +4,7 @@
  * Plugin URI: https://www.transdirect.com.au/e-commerce/woo-commerce/
  * Description: This plugin allows you to calculate shipping as per your delivery location.
  * FAQ: https://www.transdirect.com.au/e-commerce/woo-commerce/
- * Version: 1.8
+ * Version: 1.9
  * Author: Transdirect
  * Author URI: http://transdirect.com.au/
  * Text Domain: woocommerce_transdirect
@@ -17,82 +17,82 @@ if (!defined('ABSPATH')) exit;
 if (!session_id()) session_start();
 error_reporting(E_ALL & ~E_NOTICE);
 
-global $couriers_names;
+// global $couriers_names;
 
-$couriers_name  = array(
-    'allied' => array(
-        'name' => 'Allied Express',
-        'services' => 'Express'
-    ),
-    'couriers_please' => array(
-        'name' => 'Couriers Please',
-        'services' => ''
-    ),  
-    'fastway' => array(
-        'name' => 'Fastway',
-        'services' => ''
-    ),  
-    'mainfreight' => array(
-        'name' => 'Mainfreight',
-        'services' => ''
-    ), 
-    'northline' => array(
-        'name' => 'Northline',
-        'services' => ''
-    ),
-    'toll' => array(
-        'name' => 'Toll',
-        'services' => 'Express'
-    ),
-    'toll_priority_sameday' => array(
-        'name' => 'Toll Priority Sameday',
-        'services' => 'Sameday'
-    ), 
-    'toll_priority_overnight' => array(
-        'name' => 'Toll Priority Overnight',
-        'services' => 'Overnight'
-    ),
-    'auspost_regular_eparcel' => array(
-        'name' => 'Auspost Regular Eparcel',
-        'services' => 'Regular'
-    ),
-    'auspost_express_eparcel' => array(
-        'name' => 'Auspost Express Eparcel',
-        'services' => 'Express'
-    ),  
-    'tnt_nine_express' => array(
-        'name' => 'TNT Nine Express',
-        'services' => 'Nine Express'
-    ),
-    'tnt_overnight_express' => array(
-        'name' => 'TNT Overnight Express',
-        'services' => 'Overnight Express'
-    ),
-    'tnt_road_express' => array(
-        'name' => 'TNT Road Express',
-        'services' => 'Road Express'
-    ),
-    'tnt_ten_express' => array(
-        'name' => 'TNT Ten Express',
-        'services' => 'Ten Express'
-    ),
-    'tnt_twelve_express' => array(
-        'name' => 'TNT Twelve Express',
-        'services' => 'Twelve Express'
-    ),
-    'direct_couriers_regular' => array(
-        'name' => 'Direct Regular Couriers',
-        'services' => 'Regular'
-    ),
-     'direct_couriers_express' => array(
-        'name' => 'Direct Express Couriers',
-        'services' => 'Express'
-    ),
-    'direct_couriers_elite' => array(
-        'name' => 'Direct Elite Couriers',
-        'services' => 'Elite'
-    )
-);
+// $couriers_name  = array(
+//     'allied' => array(
+//         'name' => 'Allied Express',
+//         'services' => 'Express'
+//     ),
+//     'couriers_please' => array(
+//         'name' => 'Couriers Please',
+//         'services' => ''
+//     ),  
+//     'fastway' => array(
+//         'name' => 'Fastway',
+//         'services' => ''
+//     ),  
+//     'mainfreight' => array(
+//         'name' => 'Mainfreight',
+//         'services' => ''
+//     ), 
+//     'northline' => array(
+//         'name' => 'Northline',
+//         'services' => ''
+//     ),
+//     'toll' => array(
+//         'name' => 'Toll',
+//         'services' => 'Express'
+//     ),
+//     'toll_priority_sameday' => array(
+//         'name' => 'Toll Priority Sameday',
+//         'services' => 'Sameday'
+//     ), 
+//     'toll_priority_overnight' => array(
+//         'name' => 'Toll Priority Overnight',
+//         'services' => 'Overnight'
+//     ),
+//     'auspost_regular_eparcel' => array(
+//         'name' => 'Auspost Regular Eparcel',
+//         'services' => 'Regular'
+//     ),
+//     'auspost_express_eparcel' => array(
+//         'name' => 'Auspost Express Eparcel',
+//         'services' => 'Express'
+//     ),  
+//     'tnt_nine_express' => array(
+//         'name' => 'TNT Nine Express',
+//         'services' => 'Nine Express'
+//     ),
+//     'tnt_overnight_express' => array(
+//         'name' => 'TNT Overnight Express',
+//         'services' => 'Overnight Express'
+//     ),
+//     'tnt_road_express' => array(
+//         'name' => 'TNT Road Express',
+//         'services' => 'Road Express'
+//     ),
+//     'tnt_ten_express' => array(
+//         'name' => 'TNT Ten Express',
+//         'services' => 'Ten Express'
+//     ),
+//     'tnt_twelve_express' => array(
+//         'name' => 'TNT Twelve Express',
+//         'services' => 'Twelve Express'
+//     ),
+//     'direct_couriers_regular' => array(
+//         'name' => 'Direct Regular Couriers',
+//         'services' => 'Regular'
+//     ),
+//      'direct_couriers_express' => array(
+//         'name' => 'Direct Express Couriers',
+//         'services' => 'Express'
+//     ),
+//     'direct_couriers_elite' => array(
+//         'name' => 'Direct Elite Couriers',
+//         'services' => 'Elite'
+//     )
+// );
 
 /**
  * Check if WooCommerce is active
@@ -165,8 +165,23 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                 function admin_options() {
                     global $woocommerce, $wpdb;
                     $field = $this->plugin_id . $this->id . '_';
+
+
                     $shipping_details = $wpdb->get_results("SELECT `option_value` FROM " . $wpdb->prefix . "options WHERE `option_name`='" . $field . "settings'");
                     $default_values = unserialize($shipping_details[0]->option_value);
+
+                    $ch1 = curl_init();
+                    curl_setopt($ch1, CURLOPT_URL, "https://www.transdirect.com.au/api/couriers");
+                    curl_setopt($ch1, CURLOPT_RETURNTRANSFER, TRUE);
+                    curl_setopt($ch1, CURLOPT_HEADER, FALSE);
+                    curl_setopt($ch1, CURLOPT_HTTPHEADER, array(
+                      "Authorization: Basic  " . base64_encode($default_values['email'] . ":" . $default_values['password']),
+                      "Content-Type: application/json"
+                    ));
+                    curl_setopt($ch1, CURLOPT_SSL_VERIFYPEER, false);
+                    $couriers_name = curl_exec($ch1);
+                    curl_close($ch1);
+                    $couriers_name = json_decode($couriers_name);
                     wp_localize_script( 'your-script-name', 'MyAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));
                     include 'part_htm.php';
                 }
@@ -715,7 +730,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                         }
                           
                         if($default_values['enabled_surcharge_'.$base] == 'yes') {
-                            if($default_values['courier_unit'] == '%'){
+                            if($default_values['corunit_'. $base] == '%'){
                                  $default_values['courier_surcharge_'.$base] = $default_values['courier_surcharge_'.$base] / 100;
                             } 
                             $individual_handling_surcharge = number_format($default_values['courier_surcharge_'.$base], 2); 
