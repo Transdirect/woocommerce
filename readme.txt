@@ -106,4 +106,7 @@ This section describes how to install the plugin and get it working.
 * Change units of surcharge per courier.
 * Change courier name and services.
 
+= 2.0 =
+* Shortens long naming string.
+* Add conversion for dimension units and weights.  
 

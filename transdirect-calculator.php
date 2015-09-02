@@ -4,7 +4,7 @@
  *
  * @author 		WooThemes
  * @package 	WooCommerce/Templates
- * @version     1.9
+ * @version     2.0
  */
  
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
@@ -398,7 +398,7 @@ if (isset($_SESSION['price']) &&
 					<p class="courier-selected"> 
 						<b>Selected Courier:</b>&nbsp;
 						<i><?php echo $string = str_replace('_', ' ', $_SESSION['selected_courier']);?></i>
-						- <strong><?php echo get_woocommerce_currency_symbol().' '.$_SESSION['price']; ?></strong>
+						- <strong><?php echo get_woocommerce_currency_symbol().' '.number_format($_SESSION['price'], 2); ?></strong>
 					</p>
 					<input type="hidden" class="get_postcode" value="<?= $_SESSION['postcode']?>">
 					<input type="hidden" class="get_location" value="<?= $_SESSION['to_location']?>">

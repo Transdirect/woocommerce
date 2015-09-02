@@ -4,7 +4,7 @@
  * Plugin URI: https://www.transdirect.com.au/e-commerce/woo-commerce/
  * Description: This plugin allows you to calculate shipping as per your delivery location.
  * FAQ: https://www.transdirect.com.au/e-commerce/woo-commerce/
- * Version: 1.9
+ * Version: 2.0
  * Author: Transdirect
  * Author URI: http://transdirect.com.au/
  * Text Domain: woocommerce_transdirect
@@ -571,19 +571,19 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
             $_SESSION['to_location'] = $api_arr['receiver']['suburb'];
 
 
-
             $cart_content = WC()->cart->get_cart();
             $i = 0;
 
             $items_list  = array();
             $box_items = array();
 
+            // get_option('woocommerce_dimension_unit') == 'mm'
                 foreach($cart_content as $cc) {
-
                     $meta_values = get_post_meta($cc['data']->id);
-                    if (!empty($meta_values['_weight']['0']) )
+
+                    if (!empty($meta_values['_weight']['0']) ) 
                         $api_arr['items'][$i]['weight'] = $meta_values['_weight']['0'];
-                    else
+                    else 
                         $api_arr['items'][$i]['weight'] = $default_values['weight'];
                 
                     // If less than 1
@@ -607,6 +607,17 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                 
                     $api_arr['items'][$i]['quantity'] = $cc['quantity'];
                     $api_arr['items'][$i]['description'] = 'carton';
+
+
+                    if(get_option('woocommerce_dimension_unit') != 'cm') {
+                        $api_arr['items'][$i]['height'] =  wc_get_dimension($api_arr['items'][$i]['height'], get_option('woocommerce_dimension_unit'));
+                        $api_arr['items'][$i]['length'] =  wc_get_dimension($api_arr['items'][$i]['length'], get_option('woocommerce_dimension_unit'));
+                        $api_arr['items'][$i]['width']  =  wc_get_dimension($api_arr['items'][$i]['width'], get_option('woocommerce_dimension_unit'));
+                    } 
+
+                    if(get_option('woocommerce_weight_unit') != 'kg') {
+                        $api_arr['items'][$i]['weight']  = wc_get_weight( $api_arr['items'][$i]['weight'], get_option('woocommerce_weight_unit'));
+                    }
 
                     if($default_values['enabled_group_box'] == 'yes')  {
                         $cubic_weight = ($api_arr['items'][$i]['length'] * $api_arr['items'][$i]['width'] * $api_arr['items'][$i]['height']) / 250;
@@ -721,7 +732,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 
                         // if ($default_values['show_courier'] == 'yes') {
                         $courier_name = ucwords(str_replace('_', ' ', $k));
-                        if (empty($default_values['courier_'.$k])) {
+                        if (empty($default_values['cor_'.$k])) {
                             // get base
                             $delimiterPos = strpos($k, '_');
                             $base = $delimiterPos != FALSE ? substr($k, 0, $delimiterPos) : $k;
@@ -729,17 +740,17 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                             $base = $k;
                         }
                           
-                        if($default_values['enabled_surcharge_'.$base] == 'yes') {
-                            if($default_values['corunit_'. $base] == '%'){
-                                 $default_values['courier_surcharge_'.$base] = $default_values['courier_surcharge_'.$base] / 100;
+                        if($default_values['enabsurg_'.$base] == 'yes') {
+                            if($default_values['cu_'. $base] == '%'){
+                                 $default_values['cg_'.$base] = $default_values['cg_'.$base] / 100;
                             } 
-                            $individual_handling_surcharge = number_format($default_values['courier_surcharge_'.$base], 2); 
+                            $individual_handling_surcharge = number_format($default_values['cg_'.$base], 2); 
                             $total_price += $individual_handling_surcharge;
                         }
 
                         $continue = false;
-                        if (!empty($default_values['rename_group_'.$base])) {
-                            $courier_name = ucwords($default_values['rename_group_'.$base]);
+                        if (!empty($default_values['rg_'.$base])) {
+                            $courier_name = ucwords($default_values['rg_'.$base]);
                             foreach ($total_quote as $key => $value) {
                                 if ($value['courier'] == $courier_name) {
                                     if ($total_price < $value['totals']) {
@@ -753,8 +764,9 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                             }
                         }
                         if ($continue) { continue; }
-                        
-                        if (!empty($default_values['courier_'.$base])) {
+
+
+                        if (!empty($default_values['cor_'.$base])) {
                             //push data in an  array to access after the loop
                             array_push($total_quote, array(
                                 'courier' => $courier_name, 

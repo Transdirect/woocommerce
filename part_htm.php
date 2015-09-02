@@ -3,7 +3,7 @@
  * Shipping Transdirect Settings
  *
  * @author 		Transdirect Developer
- * @version     1.9
+ * @version     2.0
  */
 ?>
 
@@ -600,7 +600,7 @@
 						<td>Suburb</td>
 	                    <td>
 						    <input class="order-sync" type="text" name="<?php echo $field; ?>order_suburb" id="<?php echo $field; ?>order_suburb" 
-						     value="<?php echo $default_values['order_suburb']; ?>" autocomplete="off" placeholder="Enter youe postcode, suburb">
+						     value="<?php echo $default_values['order_suburb']; ?>" autocomplete="off" placeholder="Enter your postcode, suburb">
 							<br/>
 						    <span class="loading-div" class="hidden-table"></span>
 						    <div class="autocomplete-div"></div>
@@ -737,9 +737,9 @@
 										<?php foreach ($services as $key => $services): ?>
 											<tr>
 												<td>
-													<input type="checkbox" name="<?php echo $field .'courier_'. $services; ?>" 
+													<input type="checkbox" name="<?php echo $field .'cor_'. $services; ?>" 
 													id="<?php echo $field; ?>value[]" class="enable_courier" value="yes" onchange="selectCourier()"
-													<?php if ($default_values['courier_'. $services] == 'yes' || $default_values['courier_'. $services] == '') : ?>checked="checked" <?php endif; ?>>
+													<?php if ($default_values['cor_'. $services] == 'yes' || $default_values['cor_'. $services] == '') : ?>checked="checked" <?php endif; ?>>
 												</td>
 												<td>
 													<?php echo $courier; ?>
@@ -748,26 +748,26 @@
 													<?php echo gettype($value) == 'string' ? '' : $key; ?>
 												</td>
 												<td>	
-													<input type="text" name="<?php echo $field .'rename_group_'. $services; ?>" 
-													id="<?php echo $field .'rename_group_'. $services; ?>" class="quotes_display_rename"
-					                        		value="<?php echo $default_values['rename_group_'.$services]; ?>">
+													<input type="text" name="<?php echo $field .'rg_'. $services; ?>" 
+													id="<?php echo $field .'rg_'. $services; ?>" class="quotes_display_rename"
+					                        		value="<?php echo $default_values['rg_'.$services]; ?>">
 												</td>
 												<td>
 													<div class="include_surcharge_container">
-														<input type="number" name="<?php echo $field .'courier_surcharge_'. $services; ?>" 
-														id="<?php echo $field .'courier_surcharge_'. $services; ?>" class="quotes_display"
-						                        		value="<?php echo $default_values['courier_surcharge_'. $services]; ?>" >
+														<input type="number" name="<?php echo $field .'cg_'. $services; ?>" 
+														id="<?php echo $field .'cg_'. $services; ?>" class="quotes_display"
+						                        		value="<?php echo $default_values['cg_'. $services]; ?>" >
 
-						                        		<select class="select " name="<?php echo $field .'corunit_'. $services; ?>" id="<?php echo $field .'corunit_'. $services; ?>">
-															<option value="$" <?php if($default_values['corunit_'. $services]=='$'): ?> selected="selected"<?php endif; ?>>$</option>
-															<option value="%" <?php if($default_values['corunit_'. $services]=='%'): ?> selected="selected"<?php endif; ?> >%</option>
+						                        		<select class="select " name="<?php echo $field .'cu_'. $services; ?>" id="<?php echo $field .'cu_'. $services; ?>">
+															<option value="$" <?php if($default_values['cu_'. $services]=='$'): ?> selected="selected"<?php endif; ?>>$</option>
+															<option value="%" <?php if($default_values['cu_'. $services]=='%'): ?> selected="selected"<?php endif; ?> >%</option>
 														</select>
 													</div>
 												</td>
 												<td>
-													<input class="enable-insurance" type="checkbox" name="<?php echo $field .'enabled_surcharge_'. $services; ?>"
-													id="<?php echo $field; ?>enabled_surcharge[]" value="yes" onchange="selectInsurance()" 
-													<?php if ($default_values['enabled_surcharge_'.$services] == 'yes') { ?>checked="checked" <?php } ?>>
+													<input class="enable-insurance" type="checkbox" name="<?php echo $field .'enabsurg_'. $services; ?>"
+													id="<?php echo $field; ?>enabsurg[]" value="yes" onchange="selectInsurance()" 
+													<?php if ($default_values['enabsurg_'.$services] == 'yes') { ?>checked="checked" <?php } ?>>
 												</td>
 											</tr>
 										<?php endforeach;?>
