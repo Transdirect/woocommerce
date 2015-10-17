@@ -3,7 +3,7 @@
  * Shipping Transdirect Settings
  *
  * @author 		Transdirect Developer
- * @version     2.0
+ * @version     2.1
  */
 ?>
 
@@ -297,6 +297,7 @@
 		display: -webkit-inline-flex;
 		display: -ms-inline-flexbox;
 	}
+
 	@media only screen and (-webkit-min-device-pixel-ratio:2), only screen and (min-resolution:144dpi) {
 		.chosen-container .chosen-results-scroll-down span, 
 		.chosen-container .chosen-results-scroll-up span, 
@@ -310,7 +311,11 @@
 			background-repeat:no-repeat!important;
 		}
 	}
-
+	
+	.woocommerce table.form-table input.regular-input.api {
+		width: 25em !important;
+	    height: 2.5em !important;
+	}
 </style>
 
 
@@ -405,6 +410,17 @@
 		                </td>
 					</tr>
 					<tr>
+						<td>API Key:</td>
+		                <td>
+			                 <input class="input-text regular-input api" type="text" name="<?php echo $field;?>api_key" id="<?php echo $field; ?>api_key"
+						     value="<?php echo $default_values['api_key']; ?>">
+						     
+						     <img class="help_tip" data-tip="API key of the account provided by Transdirect" 
+						     src="<?php echo plugins_url();?>/woocommerce/assets/images/help.png" height="16" width="16" />
+					        <input type="hidden" name="transdirect_hidden" id="transdirect_hidden" value="1" />
+		                </td>
+					</tr>
+				<!-- 	<tr>
 					    <td>Email:</td>
 					    <td>
 						    <input class="input-text regular-input " type="email" name="<?php echo $field;?>email" id="<?php echo $field; ?>email"
@@ -422,7 +438,7 @@
 						    <img class="help_tip" data-tip="Authentication password provided by Transdirect" 
 						    src="<?php echo plugins_url(); ?>/woocommerce/assets/images/help.png" height="16" width="16" />
 					    </td>
-					</tr>
+					</tr> -->
 					<tr class="hidden-table">
 					    <td></td>
 					    <td>&nbsp;</td>
@@ -663,7 +679,7 @@
 							Apply General Surcharge<img class="help_tip" data-tip="Add a surcharge to the quoted amounts." 
 							src="<?php echo plugins_url(); ?>/woocommerce/assets/images/help.png" height="16" width="16" />
 							
-							<input type="text" name="<?php echo $field; ?>surcharge_price" id="<?php echo $field; ?>surcharge_price" 
+							<input type="number" name="<?php echo $field; ?>surcharge_price" id="<?php echo $field; ?>surcharge_price" 
 							 class="quote-options" value="<?php echo $default_values['surcharge_price']; ?>">
 							
 							<select class="select " name="<?php echo $field; ?>unit" id="<?php echo $field; ?>unit">
@@ -679,9 +695,9 @@
 							
 							Fixed Price on Error<img class="help_tip" data-tip="If there is some error getting a quote, just return the set fixed price." 
 							src="<?php echo plugins_url(); ?>/woocommerce/assets/images/help.png" height="16" width="16" />
-
-							<div class="placeholder dimension" data-placeholder="$">
-								<input type="price" name="<?php echo $field; ?>fixed_error_price" id="<?php echo $field; ?>fixed_error_price" 
+	
+							<div class="placeholder weight" data-placeholder="$">
+								<input type="number" name="<?php echo $field; ?>fixed_error_price" id="<?php echo $field; ?>fixed_error_price" 
 								 class="quote-options" value="<?php echo $default_values['fixed_error_price']; ?>">
 							</div>
 						</td>
@@ -806,8 +822,8 @@
                     <tr>
                         <td align="center">
                             Box Size: 
-                            <div class="placeholder" data-placeholder=" kg">
-	                            <input class="input-text regular-input" type="text" name="<?php echo $field; ?>box_size" 
+                            <div class="placeholder" data-placeholder="kg">
+	                            <input class="input-text regular-input" type="number" name="<?php echo $field; ?>box_size" 
 	                            id="<?php echo $field; ?>box_size" style="width:100px; padding-right: 30px;" 
 	                            value="<?php echo $default_values['box_size']; ?>" >
                             </div>
@@ -897,6 +913,18 @@
 
 	});
 
+	jQuery('.form-table').on('input', 'input[type="number"]', function() {
+			jQuery(this).each(function() {
+				if(jQuery(this).val() <= 0 && jQuery(this).val()){ 
+					alert('Please input valid value.');
+					jQuery(this).css('border', '1px solid red');
+					jQuery('input[type="submit"].button-primary').attr('disabled', 'disabled');
+				} else {
+					jQuery('input[type="submit"].button-primary').removeAttr('disabled');
+					jQuery(this).css('border', '1px solid #ddd');
+				}
+			});
+	});
 
 	function get_value(postcode, locality, context) {
 		jQuery('#'+ context).val(postcode + ',' + locality);

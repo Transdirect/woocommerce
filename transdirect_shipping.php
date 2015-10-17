@@ -4,110 +4,52 @@
  * Plugin URI: https://www.transdirect.com.au/e-commerce/woo-commerce/
  * Description: This plugin allows you to calculate shipping as per your delivery location.
  * FAQ: https://www.transdirect.com.au/e-commerce/woo-commerce/
- * Version: 2.0
+ * Version: 2.1
  * Author: Transdirect
  * Author URI: http://transdirect.com.au/
  * Text Domain: woocommerce_transdirect
  * Domain Path: /lang
 **/
 
-// Exit if accessed directly
-if (!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit; //Exit if accessed directly
 
 if (!session_id()) session_start();
 error_reporting(E_ALL & ~E_NOTICE);
 
-// global $couriers_names;
+/*
+*
+* Condition to check if WooCommerce is active
+*
+*/
+if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins'))) ) {
 
-// $couriers_name  = array(
-//     'allied' => array(
-//         'name' => 'Allied Express',
-//         'services' => 'Express'
-//     ),
-//     'couriers_please' => array(
-//         'name' => 'Couriers Please',
-//         'services' => ''
-//     ),  
-//     'fastway' => array(
-//         'name' => 'Fastway',
-//         'services' => ''
-//     ),  
-//     'mainfreight' => array(
-//         'name' => 'Mainfreight',
-//         'services' => ''
-//     ), 
-//     'northline' => array(
-//         'name' => 'Northline',
-//         'services' => ''
-//     ),
-//     'toll' => array(
-//         'name' => 'Toll',
-//         'services' => 'Express'
-//     ),
-//     'toll_priority_sameday' => array(
-//         'name' => 'Toll Priority Sameday',
-//         'services' => 'Sameday'
-//     ), 
-//     'toll_priority_overnight' => array(
-//         'name' => 'Toll Priority Overnight',
-//         'services' => 'Overnight'
-//     ),
-//     'auspost_regular_eparcel' => array(
-//         'name' => 'Auspost Regular Eparcel',
-//         'services' => 'Regular'
-//     ),
-//     'auspost_express_eparcel' => array(
-//         'name' => 'Auspost Express Eparcel',
-//         'services' => 'Express'
-//     ),  
-//     'tnt_nine_express' => array(
-//         'name' => 'TNT Nine Express',
-//         'services' => 'Nine Express'
-//     ),
-//     'tnt_overnight_express' => array(
-//         'name' => 'TNT Overnight Express',
-//         'services' => 'Overnight Express'
-//     ),
-//     'tnt_road_express' => array(
-//         'name' => 'TNT Road Express',
-//         'services' => 'Road Express'
-//     ),
-//     'tnt_ten_express' => array(
-//         'name' => 'TNT Ten Express',
-//         'services' => 'Ten Express'
-//     ),
-//     'tnt_twelve_express' => array(
-//         'name' => 'TNT Twelve Express',
-//         'services' => 'Twelve Express'
-//     ),
-//     'direct_couriers_regular' => array(
-//         'name' => 'Direct Regular Couriers',
-//         'services' => 'Regular'
-//     ),
-//      'direct_couriers_express' => array(
-//         'name' => 'Direct Express Couriers',
-//         'services' => 'Express'
-//     ),
-//     'direct_couriers_elite' => array(
-//         'name' => 'Direct Elite Couriers',
-//         'services' => 'Elite'
-//     )
-// );
-
-/**
- * Check if WooCommerce is active
- */
-if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')) ) ) {
-
+    /**
+    *
+    * Initialize transdirect plugin
+    *
+    */
     function woocommerce_transdirect_init() {
 
-        if (!class_exists('WC_Transdirect_Shipping')) {
+        if ( !class_exists('WC_Transdirect_Shipping') ) {
 
+            /**
+            *
+            * Overrides shpping class method for transdirect shipping.
+            *
+            * @class       WC_Transdirect_Shipping
+            * @package     WooCommerce/Classes
+            * @category    Class
+            *
+            */
             class WC_Transdirect_Shipping extends WC_Shipping_Method {
+                public $tax_status   = '';
                 /**
-                 * Constructor for your shipping class
-                 * @access public
-                 */
+                *
+                * Constructor for your shipping class
+                * @access public
+                *
+                */
+
                 public function __construct() {
 
                     $this->id = 'woocommerce_transdirect';
@@ -117,31 +59,48 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                     $this->wc_shipping_init();
                 }
 
-                /* Init the settings */
+                /**
+                *
+                * Inigtializes shipping and load the settings API
+                * @access public
+                *
+                */
+
                 function wc_shipping_init() {
                     // Let's sort arrays the right way
                     setlocale(LC_ALL, get_locale());
-                    // Regions - Source: http://www.geohive.com/earth/gen_codes.aspx
-                    // Load the settings API
+
                     // This is part of the settings API. Override the method to add your own settings
                     $this->init_form_fields();
+                   
                     // This is part of the settings API. Loads settings you previously init.
                     $this->init_settings();
-                    if (isset($this->settings['title']))
+
+                    if (isset($this->settings['title'])) {
                         $this->title = $this->settings['title'];
-                    else
+                    }
+                    else {
                         $this->title = '';
-                    if (isset($this->settings['enabled']))
+                    }
+                    if (isset($this->settings['enabled'])) {
                         $this->enabled= $this->settings['enabled'];
-                    else
+                    }
+                    else {
                         $this->enabled = $this->settings['enabled'];
+                    }
+
                     // Save settings in admin if you have any defined
                     add_action( 'woocommerce_update_options_shipping_' . $this->id, array($this, 'process_admin_options'));
                 }
 
+
                 /**
-                * The Shipping Fields
+                *
+                * Initialize shipping form fields.
+                * @access public
+                *
                 */
+
                 function init_form_fields() {
                     $this->form_fields = array(
                         'enabled' => array(
@@ -156,57 +115,65 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                     );
                 }
 
+
                 /**
-                 * admin_options function.
-                 *
-                 * @access public
-                 * @return void
-                 */
+                *  Set up for admin transdirect setting options.
+                *
+                * @access public
+                * @return void
+                *
+                */
+
                 function admin_options() {
                     global $woocommerce, $wpdb;
                     $field = $this->plugin_id . $this->id . '_';
 
-
                     $shipping_details = $wpdb->get_results("SELECT `option_value` FROM " . $wpdb->prefix . "options WHERE `option_name`='" . $field . "settings'");
                     $default_values = unserialize($shipping_details[0]->option_value);
 
-                    $ch1 = curl_init();
-                    curl_setopt($ch1, CURLOPT_URL, "https://www.transdirect.com.au/api/couriers");
-                    curl_setopt($ch1, CURLOPT_RETURNTRANSFER, TRUE);
-                    curl_setopt($ch1, CURLOPT_HEADER, FALSE);
-                    curl_setopt($ch1, CURLOPT_HTTPHEADER, array(
-                      "Authorization: Basic  " . base64_encode($default_values['email'] . ":" . $default_values['password']),
-                      "Content-Type: application/json"
-                    ));
-                    curl_setopt($ch1, CURLOPT_SSL_VERIFYPEER, false);
-                    $couriers_name = curl_exec($ch1);
-                    curl_close($ch1);
-                    $couriers_name = json_decode($couriers_name);
+                    // Request to get all list of couriers
+                    $args = array(
+                        'headers'   => array(
+                            'Content-Type'  => 'application/json'
+                        ),
+                        'timeout'   => 45
+                    );
+
+                    $link = "https://www.transdirect.com.au/api/couriers";
+                    $response = wp_remote_retrieve_body(wp_remote_get($link, $args));
+                    $couriers_name = json_decode($response);
+
                     wp_localize_script( 'your-script-name', 'MyAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));
                     include 'part_htm.php';
                 }
                 
+                /**
+                *  
+                * Process admin transdirect setting options in database.
+                * @access public
+                * @return boolean
+                *
+                */
 
                 function process_admin_options() {
                     global $wpdb;
 
                     if (!empty($_POST['transdirect_hidden'])) {
+
                         $data = array();
                         $field    = 'woocommerce_woocommerce_transdirect_';
         
-                        foreach($_POST as $k=>$val) {
+                        foreach($_POST as $k => $val) {
                             $key = str_replace ($field,'',$k);
                             $data[$key] = $val;
                         }
-            
+
                         $default_values_plugin = serialize($data);
-                        $shipping_details_plugin = $wpdb->get_results("SELECT `option_value` FROM ". $wpdb->prefix ."options WHERE `option_name` like '%woocommerce_transdirect_settings'");
+                        $shipping_details_plugin = $wpdb->get_results("SELECT `option_value` FROM ". $wpdb->prefix ."options WHERE `option_name` like '%woocommerce_transdirt_settings'");
 
                         if(count($shipping_details_plugin) > 0) {
-                            //echo "UPDATE `wp_options` SET  `option_value`='".$default_values_plugin."' WHERE `option_name`='woocommerce_woocommerce_transdirect_settings'";exit;
                             $wpdb->query("UPDATE ". $wpdb->prefix ."options SET  `option_value`='".$default_values_plugin."' WHERE `option_name` like  '%woocommerce_transdirect_settings'");
                         } else {
-                            //$wpdb->query("INSERT INTO `wp_options` SET  `option_value`='".$default_values_plugin."', `option_name` like '%woocommerce_transdirect_settings'");
                             //Changed by Lee
                             $wpdb->query("INSERT INTO ". $wpdb->prefix ."options SET  `option_value`='".$default_values_plugin."', `option_name` = 'woocommerce_woocommerce_transdirect_settings'");
                         }   
@@ -215,13 +182,15 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                 }
             
                 /**
+                *
                 * Calculate the rate - This is where you'll add your rates
+                * @access public
+                *
                 */
                 public function calculate_shipping($package) {
 
                     global $woocommerce, $wpdb;
-                    $label = '';
-                
+                    
                     $shipping_details_plugin = $wpdb->get_results("SELECT `option_value` FROM " . $wpdb->prefix ."options WHERE `option_name` like '%woocommerce_transdirect_settings'");
                     $shipping_data = unserialize($shipping_details_plugin[0]->option_value);
                     
@@ -229,13 +198,15 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                         $label = __($shipping_data['title'], $this->id);
                     else
                         $label = __('Transdirect Shipping', $this->id);
-                    
+
                     $rate = array(
                         'id'        => $this->id,
                         'label'     => (trim($label)!='' ? $label : $this->title),
                         'cost'      => $_SESSION['price'],
-                        'calc_tax'  => 'per_order'
+                        'taxes'     => false,
+                        'calc_tax'  => ''
                     );
+
                     // Registers the rate
                     $this->rates = array();
                     $this->add_rate($rate);
@@ -245,10 +216,20 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
         }// end of if
     }//end of woocommerce_transdirect_init()
 
+
+    /**
+    *
+    * Hook for adding action for woocommerce_shipping_init
+    *
+    */
     add_action('woocommerce_shipping_init', 'woocommerce_transdirect_init' );
 
     /**
-    * Add to WooCommerce
+    *
+    * Add Transdirect method. 
+    * @access public
+    * @return method name.
+    *
     */
     function woocommerce_transdirect_add($methods) {
         $methods[] = 'WC_Transdirect_Shipping'; 
@@ -257,12 +238,27 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
     
     //include 'transdirect-calculator.php';
 
+    /**
+    *
+    * Hook for adding filter for woocommerce_shipping_methods
+    *
+    */
     add_filter('woocommerce_shipping_methods', 'woocommerce_transdirect_add' );
 
-    /* Hooking code */
-    /* If you're reading this you must know what you're doing ;-) Greetings from sunny Portugal! */
-    // add_filter('woocommerce_cart_totals_before_order_total', 'return_custom_price'); 
+
+    /**
+    *
+    * Hook for adding filter for woocommerce_after_calculate_totals
+    *
+    */
     add_filter('woocommerce_after_calculate_totals', 'return_custom_price');
+
+    /**
+    *
+    * Returns the custom price to cart total. 
+    * @access public
+    *
+    */
     function return_custom_price() {  
 
         global $post, $woocommerce;
@@ -270,29 +266,44 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 
         // if (WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect' && isset($_SESSION['price'])) {
         if (WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect') {
+
+            if (!isset($_SESSION['price'])) {
+                $_SESSION['price'] =  $_REQUEST['shipping_price'];
+            }
+
+            test($_SESSION['price']);
             WC()->shipping->shipping_total = $_SESSION['price'];    
             WC()->cart->total = WC()->cart->subtotal + $_SESSION['price'];
-            WC()->session->shipping_total = '0';   
+            WC()->session->shipping_total  = '0';   
             WC()->session->total = WC()->session->subtotal + $_SESSION['price'];
             WC()->session->set('shipping_total', $_SESSION['price']);
-        }  else {
+        } else {
             unset($_SESSION['price']);
         }
 
+    }    
+
+
+    function test($param) {
+        $file = fopen("test.txt","a");
+        fwrite($file, $param . "\n");
+        fclose($file);
     }
 
-    // function woo_add_cart_fee() {
-    //     global $woocommerce;
-    //     WC()->cart->add_fee(__('Shipping Cost', 'woocommerce'), $_SESSION['price']);  
-    // }
-    // add_action( 'woocommerce_calculate_totals', 'woo_add_cart_fee');
+    /**
+    *
+    * Hook for adding action for woocommerce_after_order_notes
+    *
+    */
+    add_action( 'woocommerce_after_order_notes', 'my_custom_checkout_field' );
     
 
     /**
-    * Add the field to the checkout
+    *
+    * Add Booking Id, Selected courier for custom checkout field. 
+    * @access public
+    *
     */
-    add_action( 'woocommerce_after_order_notes', 'my_custom_checkout_field' );
-     
     function my_custom_checkout_field( $checkout ) {
         echo '<div id="my_custom_checkout_field" style="display:none;"><h2>' . __('Extra Information') . '</h2>';
         woocommerce_form_field( 'selected_courier', array(
@@ -304,16 +315,25 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
         woocommerce_form_field( 'booking_id', array(
             'type'          => 'text',
             'class'         => array('my-field-class form-row-wide'),
+
             ), $_SESSION['booking_id']);
      
         echo '</div>';     
     }
-
+     
     /**
-     * Save the order meta with field value
-     */
+    *
+    * Hook for adding action for woocommerce_checkout_update_order_meta
+    *
+    */
     add_action( 'woocommerce_checkout_update_order_meta', 'my_custom_checkout_field_update_order_meta' );
      
+    /**
+    *
+    * Add Booking Id, Selected courier for order details. 
+    * @access public
+    *
+    */
     function my_custom_checkout_field_update_order_meta( $order_id ) {
         if ( ! empty( $_POST['selected_courier'] ) ) {
             update_post_meta( $order_id, 'Selected Courier', sanitize_text_field( $_POST['selected_courier'] ) );
@@ -322,55 +342,131 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
     }
     
     /**
-    * Display field value on the order edit page
+    *
+    * Hook for adding action for woocommerce_admin_order_data_after_billing_address
+    *
     */
     add_action( 'woocommerce_admin_order_data_after_billing_address', 'my_custom_checkout_field_display_admin_order_meta', 10, 1 );
-     
+    
+    /**
+    *
+    * Add Selected Courier to display in order details. 
+    * @access public
+    *
+    */
     function my_custom_checkout_field_display_admin_order_meta($order){
         echo '<p><strong>'.__('Selected Courier').':</strong> ' . get_post_meta( $order->id, 'Selected Courier', true ) . '</p>';
         // echo '<p><strong>'.__('Booking ID').':</strong> ' . get_post_meta( $order->id, 'Booking ID', true ) . '</p>';
     }
-   
+    
+    /**
+    *
+    * Add Css and javascript files. 
+    * @access public
+    *
+    */
     function add_my_css_and_my_js_files() {
         wp_enqueue_script('your-script-name', plugins_url('transdirect.js', __FILE__), array('jquery'), '1.2.3', true);
         wp_localize_script( 'your-script-name', 'MyAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )) );
     }
 
+    /**
+    *
+    * Hook for adding action to wp_enqueue_scripts
+    *
+    */
     add_action('wp_enqueue_scripts', "add_my_css_and_my_js_files");
-    
-    // this hook is fired if the current viewer is not logged in
+
+    /**
+    *
+    * Hook is fired if the current viewer is not logged in
+    *
+    */
     do_action('wp_ajax_nopriv_cronstarter_activation');
     
-    // if logged in
+    /**
+    *
+    * Hook is fired if the current viewer is logged in
+    *
+    */
     do_action('wp_ajax_cronstarter_activation');
     
+
+    /**
+    *
+    * Hook is fired the cron will start.
+    *
+    */
     add_action('wp_ajax_nopriv_cronstarter_activation', 'cronstarter_activation');
     add_action('wp_ajax_cronstarter_activation', 'cronstarter_activation');
 
     // create a scheduled event (if it does not exist already)
+
+    /**
+    *
+    * This will start the and activate cron job every 5 minutes.
+    * @access public
+    *
+    */
     function cronstarter_activation() { 
         wp_clear_scheduled_hook('mycronjob');
-        // let's send it    
         wp_schedule_event( time(), '5mins', 'mycronjob' );
     }
-    // and make sure it's called whenever WordPress loads
+
+    /**
+    *
+    * Hook add action to make  cron work in background when wordpress is load.
+    *
+    */
     add_action('wp', 'cronstarter_activation');
     
+    /**
+    *
+    * Set up time interval for cron job schedules.
+    * @access public
+    *
+    */
     function cron_add_minute( $schedules ) {
-        // Adds once every 5 minutes to the existing schedules.
+
         $schedules['5mins'] = array(
-            'interval' => 5*60,
+            'interval' => 5 * 60,
             'display' => __( 'Once Every Five Minutes' )
         );
         return $schedules;
     }   
+
+
+    /**
+    *
+    * Hook add action to make cron set up time add in schedules.
+    *
+    */
     add_filter( 'cron_schedules', 'cron_add_minute' );
 
+    /**
+    *
+    * Deactivate running cron job.
+    * @access public
+    *
+    */
     function cronstarter_deactivate() { 
         wp_clear_scheduled_hook('mycronjob');
     } 
+
+    /**
+    *
+    * Hook add action to deactivate cron job.
+    *
+    */
     register_deactivation_hook (__FILE__, 'cronstarter_deactivate');
 
+
+    /**
+    *
+    * Set up process when running the cron job.
+    * @access public
+    *
+    */
     function my_repeat_function() {
         global $wpdb;   
 
@@ -389,44 +485,55 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
         $loop = new WP_Query($filters);
         $api_array = '';
 
+        $args = array(
+            'headers'   => array(
+                'Api-Key' => $default_values['api_key'],
+                'Content-Type'  => 'application/json'
+            ),
+            'timeout'   => 45
+        );
 
-        $ch1 = curl_init();
-        curl_setopt($ch1, CURLOPT_URL, "https://www.transdirect.com.au/api/orders/");
-        curl_setopt($ch1, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt($ch1, CURLOPT_HEADER, FALSE);
-        curl_setopt($ch1, CURLOPT_HTTPHEADER, array(
-          "Authorization: Basic  " . base64_encode($default_values['email'] . ":" . $default_values['password']),
-          "Content-Type: application/json"
-        ));
-        curl_setopt($ch1, CURLOPT_SSL_VERIFYPEER, false);
-        $response = curl_exec($ch1);
-        curl_close($ch1);
+        $link = "https://www.transdirect.com.au/api/orders/";
+        $response = wp_remote_retrieve_body(wp_remote_get($link, $args));
         $response_order = json_decode($response);
+        $status_prefix = "wc-";
 
         while ( $loop->have_posts() ) {
             $loop->the_post();
             $order = new WC_Order($loop->post->ID);
-            $statuses = wc_get_order_status_name($order->post->post_status);
+            $statuses_val = wc_get_order_status_name($order->post->post_status);
+            $statuses =  substr_replace($status_prefix, $statuses_val, 0);
+            $items = $order->get_items();
             $sku; $sale_price;
-            foreach ($order->get_items() as $key => $lineItem) {
-                $product_id = $lineItem['product_id'];
-                $product = new WC_Product($product_id);
-                $sku = $product->get_sku();
-                $sale_price = get_post_meta($product_id, '_sale_price', true);
-            }
+            foreach ($items as $item) {
+                $product_name = $item['name'];
+                $product_id = $item['product_id'];
+                $product_variation_id = $item['variation_id'];
 
+                if ($product_variation_id) { 
+                    $product = new WC_Product($item['variation_id']);
+                } else {
+                    $product = new WC_Product($item['product_id']);
+                }
+
+                // Get SKU
+                $sku = $product->get_sku();
+                //Get Price
+                $sale_price = get_post_meta($product->id, '_price', true);
+            }
 
             $from_date = substr($order->post->post_modified, 0, strpos($order->post->post_modified, ' '));
             if($default_values['order_status'] == $statuses && $default_values['order_date'] >= $from_date) {
                 $booking_id = get_post_meta($order->id, 'Booking ID', true);
                 $selected_courier = get_post_meta($order->id, 'Selected Courier', true);
+                
                 $api_array['transdirect_order_id']  = (int) $booking_id;
                 $api_array['order_id'] = $order->id;
                 $api_array['goods_summary'] = $sku;
                 $api_array['goods_dump'] = 'test';
                 $api_array['imported_from'] = 'Woocommerce';
                 $api_array['purchased_time'] = $order->order_date;
-                $api_array['sale_price'] = (int) number_format($sale_price, 2);
+                $api_sarray['sale_price'] = number_format($sale_price, 2);
                 $api_array['selected_courier'] = strtolower($selected_courier);
                 $api_array['paid_time'] = '2015-06-01T16:06:52+1000';
                 $api_array['buyer_name'] = $order->billing_first_name .' '. $order->billing_last_name;
@@ -447,47 +554,69 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                     }
                 }
 
+
                 if ($found) {
                     if ($foundOrder->last_updated <= $order->modified_date) {
                         $id  = (int) $foundOrder->id;
-                        $ch2 = curl_init();
-                        curl_setopt($ch2, CURLOPT_URL, "https://www.transdirect.com.au/api/orders/".$id);
-                        curl_setopt($ch2, CURLOPT_RETURNTRANSFER, TRUE);
-                        curl_setopt($ch2, CURLOPT_HEADER, FALSE);
-                        curl_setopt($ch2, CURLOPT_CUSTOMREQUEST, "PUT");
-                        curl_setopt($ch2, CURLOPT_POSTFIELDS, json_encode($api_array));
-                        curl_setopt($ch2, CURLOPT_HTTPHEADER, array(
-                          "Authorization: Basic  " . base64_encode($default_values['email'] . ":" . $default_values['password']),
-                          "Content-Type: application/json"
-                        ));
-                        curl_setopt($ch2, CURLOPT_SSL_VERIFYPEER, false);
-                        curl_exec($ch2);
-                        curl_close($ch2);
+                        // $ch2 = curl_init();
+                        // curl_setopt($ch2, CURLOPT_URL, "https://www.transdirect.com.au/api/orders/".$id);
+                        // curl_setopt($ch2, CURLOPT_RETURNTRANSFER, TRUE);
+                        // curl_setopt($ch2, CURLOPT_HEADER, FALSE);
+                        // curl_setopt($ch2, CURLOPT_CUSTOMREQUEST, "PUT");
+                        // curl_setopt($ch2, CURLOPT_POSTFIELDS, json_encode($api_array));
+                        // curl_setopt($ch2, CURLOPT_HTTPHEADER, array(
+                        //   "Authorization: Basic  " . base64_encode($default_values['email'] . ":" . $default_values['password']),
+                        //   "Content-Type: application/json"
+                        // ));
+                        // curl_setopt($ch2, CURLOPT_SSL_VERIFYPEER, false);
+                        // curl_exec($ch2);
+                        // curl_close($ch2);
+                        $args1 = array(
+                            'headers'   => array(
+                                'Api-Key' => $default_values['api_key'],
+                                'Content-Type'  => 'application/json'
+                            ),
+                            'method'    => 'PUT',
+                            'body'      => json_encode($api_array),
+                            'timeout'   => 45
+                        );
+
+                        $link1 = "https://www.transdirect.com.au/api/orders/" .$id;
+                        $response1 = wp_remote_retrieve_body($link1, $args1);
                     }
+
                 } else {
-                    $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_URL, "https://www.transdirect.com.au/api/orders");
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-                    curl_setopt($ch, CURLOPT_HEADER, FALSE);
-                    curl_setopt($ch, CURLOPT_POST, TRUE);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($api_array));
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                      "Authorization: Basic  " . base64_encode($default_values['email'] . ":" . $default_values['password']),
-                      "Content-Type: application/json"  
-                    ));
-                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                    curl_exec($ch);
-                    curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                    curl_close($ch);
+
+                    $args2 = array(
+                        'headers'   => array(
+                            'Api-Key' => $default_values['api_key'],
+                            'Content-Type'  => 'application/json'
+                        ),
+                        'body'      => json_encode($api_array),
+                        'timeout'   => 45
+                    );
+
+                    $link2 = "https://www.transdirect.com.au/api/orders/";
+                    $response2 = wp_remote_retrieve_body(wp_remote_post($link2, $args2));                
                 }
             }
         }
     }
 
-    // hook that function onto our scheduled event:
+    /**
+    *
+    * Hook add action that function onto our scheduled event.
+    *
+    */
     add_action ('mycronjob', 'my_repeat_function'); 
 
 
+    /**
+    *
+    * Compare totals and sort.
+    * @access public
+    *
+    */
     function cmp($a, $b) {
 
         if ($a['totals'] == $b['totals']) {
@@ -497,12 +626,28 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
     }
 
 
+    /**
+    *
+    * Hook action to set up ajax submit.
+    *
+    */
     do_action('wp_ajax_nopriv_myajaxdb-submit');
-    // if logged in
+
+    /**
+    *
+    * Hook action if logged in.
+    *
+    */
     do_action('wp_ajax_myajaxdb-submit');
     add_action('wp_ajax_nopriv_myajaxdb-submit', 'myajaxdb_submit');
     add_action('wp_ajax_myajaxdb-submit', 'myajaxdb_submit');
 
+    /**
+    *
+    * Set price and courier after submiting get quote.
+    * @access public
+    *
+    */
     function myajaxdb_submit() {
         if (!session_id()) session_start();
         $_SESSION['price'] =  $_REQUEST['shipping_price'];
@@ -512,19 +657,44 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
         exit;
     }
 
-    // this hook is fired if the current viewer is not logged in
+    /**
+    *
+    * Hook is fired if the current viewer is not logged in.
+    *
+    */
     do_action('wp_ajax_nopriv_myajax-submit');
     
-    // if logged in
+    /**
+    *
+    * Hook  is fired if the current viewer is logged in.
+    *
+    */
     do_action('wp_ajax_myajax-submit');
     
+    /**
+    *
+    * Hook  is fired when event submit is called.
+    *
+    */
     add_action('wp_ajax_nopriv_myajax-submit', 'myajax_submit');
     add_action('wp_ajax_myajax-submit', 'myajax_submit');
 
+    /**
+    *
+    * Sort the cubic weight ascending.
+    * @access public
+    *
+    */
     function sort_cubic_weight($a,$b) {
           return $a['cubic_weight']>$b['cubic_weight'];
-     }
+    }
 
+    /**
+    *
+    * Get quote and create a booking.
+    * @access public
+    *
+    */
     function myajax_submit() {
         if (!session_id()) session_start();
         global $woocommerce, $wpdb;
@@ -563,6 +733,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
             $api_arr['receiver']['type']    = $_POST['to_type'];
             $api_arr['declared_value']      = number_format(!empty($_POST['insurance_value']) ? $_POST['insurance_value'] : 0, 2, '.', '');
             $api_arr['referrer']            = 'woocommerce';
+            $api_arr['requesting_site']     = get_site_url();
             $api_arr['tailgate_pickup']     = $default_values['enabled_pickup'];
             $api_arr['tailgate_delivery']   = $default_values['enabled_delivery'];
 
@@ -570,40 +741,47 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
             $_SESSION['postcode'] =  $api_arr['receiver']['postcode'];
             $_SESSION['to_location'] = $api_arr['receiver']['suburb'];
 
-
+            
             $cart_content = WC()->cart->get_cart();
             $i = 0;
 
             $items_list  = array();
             $box_items = array();
 
-            // get_option('woocommerce_dimension_unit') == 'mm'
                 foreach($cart_content as $cc) {
                     $meta_values = get_post_meta($cc['data']->id);
 
-                    if (!empty($meta_values['_weight']['0']) ) 
+                    if (!empty($meta_values['_weight']['0']))  {
                         $api_arr['items'][$i]['weight'] = $meta_values['_weight']['0'];
-                    else 
+                    }
+                    else { 
                         $api_arr['items'][$i]['weight'] = $default_values['weight'];
-                
+                    }
                     // If less than 1
-                    if (!empty($meta_values['_weight']['0']) && $api_arr['items'][$i]['weight'] < 1)
+                    if (!empty($meta_values['_weight']['0']) && $api_arr['items'][$i]['weight'] < 1) {
                         $api_arr['items'][$i]['weight'] = '1.0';
+                    }
                 
-                    if (!empty($meta_values['_height']['0']))   
+                    if (!empty($meta_values['_height']['0']))   {
                         $api_arr['items'][$i]['height'] = $meta_values['_height']['0'];
-                    else
+                    }
+                    else {
                         $api_arr['items'][$i]['height'] = $default_values['height'];
+                    }
                 
-                    if (!empty($meta_values['_width']['0']))
+                    if (!empty($meta_values['_width']['0'])) {
                         $api_arr['items'][$i]['width'] = $meta_values['_width']['0'];
-                    else
+                    }
+                    else {
                         $api_arr['items'][$i]['width'] = $default_values['width'];
+                    }
                 
-                    if (!empty($meta_values['_length']['0']))
+                    if (!empty($meta_values['_length']['0'])) {
                         $api_arr['items'][$i]['length'] = $meta_values['_length']['0'];
-                    else
+                    }
+                    else {
                         $api_arr['items'][$i]['length'] = $default_values['length'];
+                    }
                 
                     $api_arr['items'][$i]['quantity'] = $cc['quantity'];
                     $api_arr['items'][$i]['description'] = 'carton';
@@ -619,7 +797,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                         $api_arr['items'][$i]['weight']  = wc_get_weight( $api_arr['items'][$i]['weight'], get_option('woocommerce_weight_unit'));
                     }
 
-                    if($default_values['enabled_group_box'] == 'yes')  {
+                    if($default_values['enabled_group_box'] == 'yes' && $default_values['box_size'] != '')  {
                         $cubic_weight = ($api_arr['items'][$i]['length'] * $api_arr['items'][$i]['width'] * $api_arr['items'][$i]['height']) / 250;
                             
                         if($api_arr['items'][$i]['weight'] > $cubic_weight) {
@@ -628,12 +806,18 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 
                         for($x = 1; $x <= $cc['quantity']; $x++) {
                             if ($cubic_weight > $default_values['box_size']) {
+
+                                if($default_values['box_size'] == '') {
+                                    $default_values['box_size'] = $cubic_weight;
+                                }
+
                                 for($x = $default_values['box_size']; $x <= $cubic_weight; $x *= 2) {
                                    array_push($items_list, array(
                                         'itemidx' => $i,
                                         'cubic_weight' => $default_values['box_size']
-                                    )); 
+                                    ));
                                 }
+
                                 $r = 0;
                                 if (($r = $cubic_weight % $default_values['box_size'])) {
                                     array_push($items_list, array(
@@ -641,6 +825,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                                         'cubic_weight' => $r
                                     )); 
                                 }
+
                             } else {
                                 array_push($items_list, array(
                                     'itemidx' => $i,
@@ -649,12 +834,10 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                             }
                         }
                     }
-
                     $i++;
-                }
+                } // end of foreach
 
-                if($default_values['enabled_group_box'] == 'yes')  {
-                    // usort($items_list, 'sort_cubic_weight');
+                if($default_values['enabled_group_box'] == 'yes' && $default_values['box_size'] != '')  {
                     foreach ($items_list as $item) {
                         $newBox = true;
                         foreach ($box_items as $box) {
@@ -685,13 +868,13 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 
             $args = array(
                 'headers'   => array(
-                    'Authorization' => 'Basic ' . base64_encode($default_values['email'] . ':' . $default_values['password']),
+                    'Api-Key' => $default_values['api_key'],
                     'Content-Type'  => 'application/json'
                 ),
-                // 'sslverify' => false,
                 'body'      => json_encode($api_arr),
                 'timeout'   => 45
             );
+
 
             $link = "https://www.transdirect.com.au/api/bookings";
             $response = wp_remote_retrieve_body(wp_remote_post($link, $args));
@@ -718,7 +901,6 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                 }
 
                     foreach ($shipping_quotes as $k => $sq) {
-
                         $price_insurance_ex = $sq->price_insurance_ex;
                         $insurance_fee      = $sq->fee;
                         $total              = $sq->total;
@@ -791,8 +973,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                         if ($default_values['quotes'] == 'Display all Quotes') {
 
                         $quotes['couriers'][$total_quote[$key]['courier']]['html'] = 
-                        '<input type="radio" name="shipping_type_radio" 
-                        class="shipping_type_radio" onclick="get_quote(\'' .  $replace . '\');" 
+                        '<input type="radio" name="shipping_type_radio" class="shipping_type_radio" onclick="get_quote(\'' .  $replace . '\');" 
                         id="' .  $replace . '" value="' .  $replace. '" />' . 
                         '<b>' . $total_quote[$key]['courier'] . 
                         '</b> &nbsp;-&nbsp;' . get_woocommerce_currency_symbol() . 
@@ -843,8 +1024,6 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 
                             } elseif ($quotes['cheapest']['price'] == $total_quote[$key]['totals'] || 
                                 !isset($quotes['cheapest']['price'])) {
-
-                                // var_dump($quotes['fastest']['price']);
 
                                 $quotes['cheapest']['couriers'][$total_quote[$key]['courier']] = '<input type="radio" name="shipping_type_radio" class="shipping_type_radio" 
                                     onclick="get_quote(\'' . $replace . '\');" 
@@ -973,15 +1152,24 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
     }
 
 
-    
-
+    /**
+    *
+    * Display transdirect calculator.
+    * @access public
+    *
+    */
     function plugin_test() {
         global $woocommerce, $wpdb;
         include 'transdirect-calculator.php';
     }
     
-    //cart page html show hooks
     // add_action('woocommerce_before_shipping_calculator', 'plugin_test');
+
+    /**
+    *
+    * Hook add action cart page html show hooks
+    *
+    */
     add_action('woocommerce_after_cart_totals', 'plugin_test');
     add_action('woocommerce_review_order_before_payment', 'plugin_test');
 
@@ -990,8 +1178,21 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
     // add_filter('wp_ajax_woocommerce_update_order_review', 'return_custom_price');
     // add_filter('wp_ajax_nopriv_woocommerce_update_order_review', 'return_custom_price');
     
+
+    /**
+    *
+    * Hook add filter woocommerce_cart_shipping_method_full_label
+    *
+    */
     add_filter( 'woocommerce_cart_shipping_method_full_label', 'remove_local_pickup_free_label', 10, 2 );
 
+    /**
+    *
+    * Remove free local pick up.
+    * @access public
+    * @return label of shipping (string)
+    *
+    */
     function remove_local_pickup_free_label($full_label, $method) {
 
         global $wpdb;
@@ -1013,12 +1214,20 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
         }
     }
 
-
     /**
-    * if shipping is disable
+    *
+    * Hook add filter if shipping is disable
+    *
     */
     add_filter( 'woocommerce_package_rates', 'hide_shipping_when_free_is_available', 10, 2);
 
+    /**
+    *
+    * Remove free local pick up.
+    * @access public
+    * @return rate (int)
+    *
+    */
     function hide_shipping_when_free_is_available($rates, $package) {
 
         global $wpdb;
@@ -1030,28 +1239,50 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
             $shipping_data = unserialize($shipping_details_plugin[0]->option_value);
         
             // To unset a single rate/method, do the following. This example unsets flat_rate shipping
-            if ($shipping_data['enabled'] != 'yes')
+            if ($shipping_data['enabled'] != 'yes') {
                 unset( $rates['woocommerce_transdirect'] );
+            }
         }
         
         return $rates;
     }
     
-
+    /**
+    *
+    * Hook add filter to remove session price.
+    *
+    */
     add_filter( 'woocommerce_add_cart_item_data', 'wdm_empty_cart', 10, 3);
+
+    /**
+    *
+    * Unset session for price.
+    * @access public
+    *
+    */
     function wdm_empty_cart()
     {
-        unset($_SESSION['price']);
+        // unset($_SESSION['price']);
     }
 
     /**
-    * Process the checkout
+    *
+    * Hook add action to process checkout.
+    *
     */
     add_action('woocommerce_checkout_process', 'my_custom_checkout_field_process');
     
+
+    /**
+    *
+    * Add error message in processing checkout.
+    * @access public
+    *
+    */
     function my_custom_checkout_field_process() {
         // Check if set, if its not set add an error.
         if (!$_POST['billing_postcode'] || !is_numeric($_POST['billing_postcode']))
             wc_add_notice( __( 'Please enter a valid postcode/ZIP.' ), 'error' );
     }
+
 }

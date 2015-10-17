@@ -108,5 +108,8 @@ This section describes how to install the plugin and get it working.
 
 = 2.0 =
 * Shortens long naming string.
-* Add conversion for dimension units and weights.  
+* Add conversion for dimension units and weights. 
 
+= 2.1 =
+* Fixed memory allocation exhausted. 
+* Add requesting site pass in api for analytics.

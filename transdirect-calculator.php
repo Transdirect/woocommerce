@@ -4,7 +4,7 @@
  *
  * @author 		WooThemes
  * @package 	WooCommerce/Templates
- * @version     2.0
+ * @version     2.1
  */
  
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
@@ -162,33 +162,30 @@ global $woocommerce, $wpdb; ?>
 
 <?php 
 
-if (!empty($_POST['shipping_variation']))	{
-	$shipping_details = $wpdb->get_results( "SELECT `option_value` FROM " .$wpdb->prefix . "options WHERE `option_name`='woocommerce_".WC()->session->chosen_shipping_methods[0]."_settings'");
-	$default_values = unserialize($shipping_details[0]->option_value);
+	if (!empty($_POST['shipping_variation'])) {
+		$shipping_details = $wpdb->get_results( "SELECT `option_value` FROM " .$wpdb->prefix . "options WHERE `option_name`='woocommerce_".WC()->session->chosen_shipping_methods[0]."_settings'");
+		$default_values = unserialize($shipping_details[0]->option_value);
 
-	$shipping_type = $_POST['shipping_type_radio'];
-	$price 		   = $_POST[$shipping_type.'_price'];
-	$transit_time  = $_POST[$shipping_type.'_transit_time'];
-	$service_type  = $_POST[$shipping_type.'_service_type'];
+		$shipping_type = $_POST['shipping_type_radio'];
+		$price 		   = $_POST[$shipping_type.'_price'];
+		$transit_time  = $_POST[$shipping_type.'_transit_time'];
+		$service_type  = $_POST[$shipping_type.'_service_type'];
 
-	if ($default_values['Surcharge'] == 'yes') {
-		$_SESSION['price'] =  $price + $default_values['Surcharge_price'];
-	} else {
-		$_SESSION['price'] =  $price;
+		if ($default_values['Surcharge'] == 'yes') {
+			$_SESSION['price'] =  $price + $default_values['Surcharge_price'];
+		} else {
+			$_SESSION['price'] =  $price;
+		}
 	}
-}
 
-if (isset($_SESSION['price']) && 
-	WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect') {
-
+	if (isset($_SESSION['price']) &&  WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect') {
 		$price = $_SESSION['price'];
 		WC()->shipping->shipping_total = $price;
 		WC()->cart->total = WC()->cart->subtotal + $price;
 		WC()->session->shipping_total = $price;
 		WC()->session->total = WC()->session->subtotal + $price;
-	
-	WC()->cart->add_fee(__('Shipping Cost', 'woocommerce'), $price);
-}
+		WC()->cart->add_fee(__('Shipping Cost', 'woocommerce'), $price);
+	}
 
 	if (!empty($_POST['to_location'])) {
 
@@ -241,134 +238,119 @@ if (isset($_SESSION['price']) &&
 				$api_arr['items'][$i]['description'] = 'carton';
 
 				$i++;
-			}
-		
+			}	
 			
-			$ch = curl_init();
-			curl_setopt($ch, CURLOPT_URL, "https://www.transdirect.com.au/api/bookings");
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-			curl_setopt($ch, CURLOPT_HEADER, FALSE);
-			curl_setopt($ch, CURLOPT_POST, TRUE);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($api_arr));
-					curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
-			// curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-			// 	"Authorization: Basic  " . base64_encode($default_values['email'] . ":" . $default_values['password']),
-			// 	"Content-Type: application/json"
-			// ));
-		
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-			$response1 = curl_exec($ch);
-			curl_close($ch);
+            $args = array(
+                'headers'   => array(
+                    'Authorization' => 'Basic ' . base64_encode($default_values['email'] . ':' . $default_values['password']),
+                    'Content-Type'  => 'application/json'
+                ),
+                'body'      => json_encode($api_arr),
+                'timeout'   => 45
+            );
 
-			$shipping_quotes1 = json_decode(str_replace("''","0",$response1));
+
+            $link = "https://www.transdirect.com.au/api/bookings";
+            $response1 = wp_remote_retrieve_body(wp_remote_post($link, $args));
+            $response1 = str_replace("true, // true if the booking has a tailgate pickup, false if not", "0,", $response1);
+            $response1 = str_replace("true // true if the booking has a tailgate delivery, false if not", "0", $response1);
+            $response1 = str_replace("''", "0", $response1);
+            $shipping_quotes1 = json_decode(str_replace("''", "0", $response1));
 			$shipping_quotes = $shipping_quotes1->quotes;
 		}
 	}
 ?>
 
-<?php if (WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect') : ?>
+<script>
 
-	<?php if(!isset($_SESSION['price']) || $_SESSION['price'] == '' || $_SESSION['price'] == 0) : ?>
+	jQuery(document).ready(function() {
 
-		<style>  #place_order { display : none !important; }  </style> 
-		<script> jQuery('#place_order').attr('disabled','disabled'); </script>
-
-	<?php endif; ?>
-
-	<style> form.shipping_calculator { display : none !important; } </style>
-
-	<script>
-		function hideContent() {
-			jQuery("#autocomplete-div").html('');
-			jQuery("#autocomplete-div").hide();
-		}
-
-		jQuery(document).ready(function() {
-
-			jQuery('body').click(function() {
-				jQuery('#autocomplete-div').hide('');
-				jQuery('#dynamic_content').hide('');
-			});
-			
-			if(!jQuery('body .session_price').val() && !jQuery('body .session_selected_courier').val() && 
-				(jQuery('body #billing_postcode').val() && jQuery('body #billing_city').val())) {
-
-				document.getElementById('to_location').value = jQuery('body #billing_postcode').val() +','+ jQuery('body #billing_city').val();
-				jQuery('body .button.calculator').click();
-			} 
-
-		
-			if(!jQuery('body #billing_postcode').val() || !jQuery('body #billing_city').val()){
-				jQuery('body #billing_postcode').val(jQuery('.get_postcode').val());
-				jQuery('body #billing_city').val(jQuery('.get_location').val());
-			} 
-
-			if(!jQuery('body .session_price').val() && !jQuery('body .session_selected_courier').val() && 
-				(jQuery('body #billing_postcode').val() && jQuery('body #billing_city').val()))
-				jQuery('.get_postcode').val();
-			jQuery('body').on('change', '#shipping_method input.shipping_method', function() {
-				if(jQuery(this).val() != 'woocommerce_transdirect') {
-					jQuery('div.tdCalc').hide();
-				} else {
-					jQuery('div.tdCalc').show();	
-				}
-			});
-
-			var latestRequestNumber = 0;
-			var globalTimeout = null;
-
-			jQuery('#to_location').keyup(function() {
-	            var key_val = jQuery("#to_location").val();
-				var position = jQuery("#to_location").position();
-	            var html = '';
-
-	            jQuery('#to_location').addClass('loadinggif');
-
-				if (key_val=='') {
-	                key_val=0;
-	            }
-
-				jQuery.getJSON("<?php echo plugins_url('locations.php' , __FILE__ ); ?>", {'q':key_val, requestNumber: ++latestRequestNumber }, function(data) {
-		            if (data.requestNumber < latestRequestNumber) {
-		            	return;
-		            }
-					if (data.locations != '' && key_val != '0') {
-		                jQuery.each(data.locations, function(index, value ) {
-		                	jQuery('.get_postcode').val(value.postcode);
-		                	jQuery('.get_location').val(value.locality);
-					        html = html+'<li onclick="get_value(\''+value.postcode+'\',\''+value.locality+'\')">'+value.postcode+', '+value.locality+'</li>';
-				        });
-		   
-				        var main_content = '<ul id="auto_complete">'+html+'</ul>';
-
-						jQuery("#loading-div").hide();
-				        jQuery("#autocomplete-div").show();
-				        jQuery("#autocomplete-div").html(main_content);
-				        jQuery("#autocomplete-div").css('left', position.left);
-				        jQuery("#autocomplete-div").css('top', parseInt(position.top) + 45);
-
-		            } else {
-		                 html = html+'<li>No Results Found</li>';
-		                 var main_content = '<ul id="auto_complete">'+html+'</ul>';
-		               
-		                jQuery("#autocomplete-div").show();
-				        jQuery("#autocomplete-div").html(main_content);
-				        jQuery("#autocomplete-div").css('left', position.left);
-				        jQuery("#autocomplete-div").css('top', parseInt(position.top) + 45);
-				        jQuery("#autocomplete-div").css('overflow-y','hidden');
-
-				        jQuery('#to_location').removeClass('loadinggif');
-		            }
-
-					jQuery('#to_location').removeClass('loadinggif');
-	            });
-			});
+		jQuery('body').click(function() {
+			jQuery('#autocomplete-div').hide('');
+			jQuery('#dynamic_content').hide('');
 		});
 		
-	</script>
-<?php endif; ?>
+		if(!jQuery('body .session_price').val() && !jQuery('body .session_selected_courier').val() && 
+			(jQuery('body #billing_postcode').val() && jQuery('body #billing_city').val())) {
 
-<script>
+			document.getElementById('to_location').value = jQuery('body #billing_postcode').val() +','+ jQuery('body #billing_city').val();
+			jQuery('body .button.calculator').click();
+		} 
+
+	
+		if(!jQuery('body #billing_postcode').val() || !jQuery('body #billing_city').val()){
+			jQuery('body #billing_postcode').val(jQuery('.get_postcode').val());
+			jQuery('body #billing_city').val(jQuery('.get_location').val());
+		} 
+
+		if(!jQuery('body .session_price').val() && !jQuery('body .session_selected_courier').val() && 
+			(jQuery('body #billing_postcode').val() && jQuery('body #billing_city').val()))
+			jQuery('.get_postcode').val();
+		jQuery('body').on('change', '#shipping_method input.shipping_method', function() {
+			if(jQuery(this).val() != 'woocommerce_transdirect') {
+				jQuery('div.tdCalc').hide();
+			} else {
+				jQuery('div.tdCalc').show();	
+			}
+		});
+
+		var latestRequestNumber = 0;
+		var globalTimeout = null;
+
+		jQuery('#to_location').keyup(function() {
+            var key_val = jQuery("#to_location").val();
+			var position = jQuery("#to_location").position();
+            var html = '';
+
+            jQuery('#to_location').addClass('loadinggif');
+
+			if (key_val=='') {
+                key_val=0;
+            }
+
+			jQuery.getJSON("<?php echo plugins_url('locations.php' , __FILE__ ); ?>", {'q':key_val, requestNumber: ++latestRequestNumber }, function(data) {
+	            if (data.requestNumber < latestRequestNumber) {
+	            	return;
+	            }
+				if (data.locations != '' && key_val != '0') {
+	                jQuery.each(data.locations, function(index, value ) {
+	                	jQuery('.get_postcode').val(value.postcode);
+	                	jQuery('.get_location').val(value.locality);
+				        html = html+'<li onclick="get_value(\''+value.postcode+'\',\''+value.locality+'\')">'+value.postcode+', '+value.locality+'</li>';
+			        });
+	   
+			        var main_content = '<ul id="auto_complete">'+html+'</ul>';
+
+					jQuery("#loading-div").hide();
+			        jQuery("#autocomplete-div").show();
+			        jQuery("#autocomplete-div").html(main_content);
+			        jQuery("#autocomplete-div").css('left', position.left);
+			        jQuery("#autocomplete-div").css('top', parseInt(position.top) + 45);
+
+	            } else {
+	                 html = html+'<li>No Results Found</li>';
+	                 var main_content = '<ul id="auto_complete">'+html+'</ul>';
+	               
+	                jQuery("#autocomplete-div").show();
+			        jQuery("#autocomplete-div").html(main_content);
+			        jQuery("#autocomplete-div").css('left', position.left);
+			        jQuery("#autocomplete-div").css('top', parseInt(position.top) + 45);
+			        jQuery("#autocomplete-div").css('overflow-y','hidden');
+
+			        jQuery('#to_location').removeClass('loadinggif');
+	            }
+
+				jQuery('#to_location').removeClass('loadinggif');
+            });
+		});
+	});
+	
+	
+	function hideContent() {
+		jQuery("#autocomplete-div").html('');
+		jQuery("#autocomplete-div").hide();
+	}
+
 	function get_value(postcode, locality) {
 	    jQuery("#to_location").val(postcode + ',' + locality);
 		jQuery("#autocomplete-div").html('');
@@ -379,12 +361,15 @@ if (isset($_SESSION['price']) &&
 	    jQuery("#" + field_id).val(locality);
 		jQuery("#dynamic_content").remove();
 	}
+
 </script>
 
-<?php if ( ((get_option('woocommerce_enable_shipping_calc') === 'no' || get_option('woocommerce_enable_shipping_calc') === 'yes') && 
-		  !is_cart()) || (get_option( 'woocommerce_enable_shipping_calc' ) === 'yes' && is_cart()) ): ?>
 
-	<?php  if (WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect'): ?>
+<?php if ( ((get_option('woocommerce_enable_shipping_calc') === 'no' || get_option('woocommerce_enable_shipping_calc') === 'yes') && 
+		 !is_cart()) || (get_option( 'woocommerce_enable_shipping_calc' ) === 'yes' && is_cart()) ): ?>
+
+	<?php // if (WC()->session->chosen_shipping_methods[0] == 'woocommerce_transdirect'): ?>
+		
 		<?php 
 			$shipping_details = $wpdb->get_results("SELECT `option_value` FROM " . $wpdb->prefix . "options WHERE `option_name`='woocommerce_".WC()->session->chosen_shipping_methods[0]."_settings'");
 			$default_values = unserialize($shipping_details[0]->option_value);  
@@ -452,8 +437,31 @@ if (isset($_SESSION['price']) &&
 			</div>
 		</div>
 
-	<?php endif; ?>
+	<?php// endif; ?>
+
 <?php endif; ?>
 
+<script type="text/javascript">
+	jQuery(document).ready(function() {
+		if(jQuery('select.shipping_method').val() == 'woocommerce_transdirect') {
+			jQuery('.tdCalc').show();
+		} else {
+			jQuery('.tdCalc').hide();
+		}
+	});
+	jQuery( document ).on( 'change', 'select.shipping_method, input[name^=shipping_method]', function() {
+		if(jQuery(this).val() == 'woocommerce_transdirect') {
+			jQuery('.tdCalc').show();
+		} else{
+			jQuery('.tdCalc').hide();
+		}
+	});
 
-
+	jQuery(document).ready(function() {
+		if(jQuery('li input:radio.shipping_method:checked').val() == 'woocommerce_transdirect') {
+			jQuery('.tdCalc').show();
+		} else {
+			jQuery('.tdCalc').hide();
+		}
+	});
+</script>

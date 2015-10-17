@@ -44,7 +44,6 @@ function get_quote(name) {
 	var shipping_transit_time = jQuery("#" + name + "_transit_time").val();
 	var shipping_service_type = jQuery("#" + name + "_service_type").val();
     jQuery('#trans_frm').addClass('load');
-
 	jQuery.post(
         // see tip #1 for how we declare global javascript variables
         MyAjax.ajaxurl, {
