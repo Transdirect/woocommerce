@@ -1,3 +1,4 @@
+
 <?php
 /**
  * Shipping Transdirect Settings
@@ -6,11 +7,12 @@
  * @version     2.1
  */
 ?>
-
+<!-- CSS styles -->
 <style>
 	table.form-table.shipping {
 		border-collapse:separate;
 	}
+
 	table.form-table.shipping td {
 		vertical-align:top; 
 		padding:0; 
@@ -69,7 +71,6 @@
 		text-transform: capitalize;
 	}
 
-	/*General*/
 	.border-fomat {
 		border:1px solid #ccc; 
 	}
@@ -91,7 +92,6 @@
 	.hidden-table {
 		display: none;
 	}
-
 
 	p.submit input.button-primary,
 	p.submit input.button-primary:hover,
@@ -124,7 +124,6 @@
 	 	padding: 8px 20px;
 	}
 
-	/*.logoSection, */
 	.onLineFAQ, 
 	.contactSales {
 		border:1px solid #ddd;
@@ -317,8 +316,7 @@
 	    height: 2.5em !important;
 	}
 </style>
-
-
+<!-- end of styles -->
 <h3><?php echo $this->method_title; ?></h3>
 
 <div id="main-container">
@@ -352,13 +350,24 @@
 					<tr>
 						<td>
 							<label for="<?php echo $field; ?>enabled">
-								<input class="" type="checkbox" name="<?php echo $field; ?>enabled" id="<?php echo $field; ?>enabled" style="" value="yes"
+							 	<input class="" type="checkbox" name="<?php echo $field; ?>enabled" id="<?php echo $field; ?>enabled" style="" value="yes"
 								 <?php if ($default_values['enabled'] == 'yes') : ?> checked="checked" <?php endif; ?> > 
-								 Enable Transdirect
-								 <img class="help_tip" data-tip="Enable Transdirect Shipping on your shipping method" 
-							     src="<?php echo plugins_url();?>/woocommerce/assets/images/help.png" height="16" width="16" />
 							</label>
 						</td>
+						<td>
+							Enable Transdirect
+							<img class="help_tip" data-tip="Enable Transdirect Shipping on your shipping method" 
+						    src="<?php echo plugins_url();?>/woocommerce/assets/images/help.png" height="16" width="16" />
+						</td>
+					</tr>
+		            <tr>
+		            	<td>Title:</td>
+		                <td>
+			                <input class="input-text regular-input" type="text" name="<?php echo $field; ?>title" 
+			                id="<?php echo $field; ?>title" value="<?php echo $default_values['title']; ?>">
+			                <img class="help_tip" data-tip="WooCommerce Shipping Method Name" 
+			                src="<?php echo plugins_url(); ?>/woocommerce/assets/images/help.png" height="16" width="16" />
+		                </td>
 					</tr>
 				</table>
 			</td>
@@ -388,7 +397,7 @@
 				</table>
 			</td>
 		</tr>
-		<!--  Authentication Email and password section -->
+		<!--  Authentication API KEY -->
         <tr>
 			<td width="100%" colspan="2" class="border-fomat">
 				<table width="100%">
@@ -400,16 +409,36 @@
                             src="<?php echo plugins_url(); ?>/woocommerce/assets/images/help.png" height="16" width="16" />
 					    </td>
 					</tr>
-		            <tr>
-		                <td>Title:</td>
-		                <td>
-			                <input class="input-text regular-input" type="text" name="<?php echo $field; ?>title" 
-			                id="<?php echo $field; ?>title" value="<?php echo $default_values['title']; ?>">
-			                <img class="help_tip" data-tip="WooCommerce Shipping Method Name" 
-			                src="<?php echo plugins_url(); ?>/woocommerce/assets/images/help.png" height="16" width="16" />
-		                </td>
-					</tr>
 					<tr>
+						<td>Choose Authentication Type:</td>
+						<td>
+							<select class="select" name="<?php echo $field; ?>authtype" id="<?php echo $field; ?>authtype" style="width: 275px;">
+								<option value="Email and Password" <?php if ($default_values['authtype'] == 'Email and Password') : ?> selected="selected"<?php endif; ?>>Email and Password</option>
+								<option value="API Key" <?php if ($default_values['authtype'] == 'API Key') : ?> selected="selected"<?php endif; ?> >API Key</option>
+							</select>
+						</td>
+					</tr>
+						<!--  Authentication Email and password section -->
+					<tr class="password-email">
+					    <td>Email:</td>
+					    <td>
+						    <input class="input-text regular-input " type="email" name="<?php echo $field;?>email" id="<?php echo $field; ?>email"
+						     value="<?php echo $default_values['email'];?>" autocorrect="off" autocapitalize="off">
+						     <img class="help_tip" data-tip="Authentication email provided by Transdirect" 
+						     src="<?php echo plugins_url();?>/woocommerce/assets/images/help.png" height="16" width="16" />
+					        <input type="hidden" name="transdirect_hidden" id="transdirect_hidden" value="1" />
+					    </td>
+					</tr>
+					<tr class="password-email">
+					    <td>Password:</td>
+					    <td>
+						    <input class="input-text regular-input" type="password" name="<?php echo $field;?>password" 
+						    id="<?php echo $field; ?>password" value="<?php echo $default_values['password'];?>">
+						    <img class="help_tip" data-tip="Authentication password provided by Transdirect" 
+						    src="<?php echo plugins_url(); ?>/woocommerce/assets/images/help.png" height="16" width="16" />
+					    </td>
+					</tr>
+					<tr class="api-key">
 						<td>API Key:</td>
 		                <td>
 			                 <input class="input-text regular-input api" type="text" name="<?php echo $field;?>api_key" id="<?php echo $field; ?>api_key"
@@ -420,25 +449,6 @@
 					        <input type="hidden" name="transdirect_hidden" id="transdirect_hidden" value="1" />
 		                </td>
 					</tr>
-				<!-- 	<tr>
-					    <td>Email:</td>
-					    <td>
-						    <input class="input-text regular-input " type="email" name="<?php echo $field;?>email" id="<?php echo $field; ?>email"
-						     value="<?php echo $default_values['email']; ?>">
-						     <img class="help_tip" data-tip="Authentication email provided by Transdirect" 
-						     src="<?php echo plugins_url();?>/woocommerce/assets/images/help.png" height="16" width="16" />
-					        <input type="hidden" name="transdirect_hidden" id="transdirect_hidden" value="1" />
-					    </td>
-					</tr>
-					<tr>
-					    <td>Password:</td>
-					    <td>
-						    <input class="input-text regular-input" type="password" name="<?php echo $field;?>password" 
-						    id="<?php echo $field; ?>password" value="<?php echo $default_values['password'];?>">
-						    <img class="help_tip" data-tip="Authentication password provided by Transdirect" 
-						    src="<?php echo plugins_url(); ?>/woocommerce/assets/images/help.png" height="16" width="16" />
-					    </td>
-					</tr> -->
 					<tr class="hidden-table">
 					    <td></td>
 					    <td>&nbsp;</td>
@@ -446,6 +456,7 @@
 	            </table>
 			</td>
 		</tr>
+     
 		<!-- Set up your default warehouse settings. e.g: warehouse address and default sizes] -->
         <tr>
 			<td align="left" width="50%" class="border-fomat">
@@ -786,8 +797,7 @@
 													<?php if ($default_values['enabsurg_'.$services] == 'yes') { ?>checked="checked" <?php } ?>>
 												</td>
 											</tr>
-										<?php endforeach;?>
-												
+										<?php endforeach;?>				
 									<?php endforeach; ?>
 							</table>
 						</td>
@@ -835,7 +845,9 @@
 	</table>
 </div>
 
+<!-- SCRIPTS  -->
 <script>
+	// onready
 	jQuery(document).ready(function() {
 		jQuery("#trans_frm").show();
 
@@ -844,31 +856,34 @@
 			jQuery('#dynamic_content').hide('');
 		});
 
+		//get the post code and suburb
+		getPostcodeSub();
+		// order details function
+		order_details();
+		// auth details function
+		auth_details();
+		//auth type on change
+		authtypechange();
+		//number validation in all fields
+		numberValidation();
 
-		jQuery('.order .order-status-sync').on('click', function(e) {    
-			jQuery('.from-address input[type="text"]').each(function() {
-				if(!jQuery(this).val()) {
-					e.preventDefault();
-				}
-			});
-		}); 
+	});
+	// end of on ready
 
-		jQuery('.from-address').on('input', 'input[type="text"]', function() {
-			 if(!jQuery(this).val()) {
-			 	jQuery('.order .order-status-sync').removeAttr('checked');
-			 }
-		});
-	
+
+	function getPostcodeSub(){
 
 		var latestRequestNumber = 0;
 		var globalTimeout = null;
 
-		jQuery(document).on('keyup', '#woocommerce_woocommerce_transdirect_postcode, #woocommerce_woocommerce_transdirect_order_suburb', 
-			function() {
+		jQuery(document).on('keyup', '#woocommerce_woocommerce_transdirect_postcode,' 
+			+ '#woocommerce_woocommerce_transdirect_order_suburb', function() {
 
+			// variables
 			var key_val = jQuery(this).val();
 			var position = jQuery(this).position();
 			var html = '';
+			var context = this;
 
 			jQuery(this).addClass('loadinggif');
 
@@ -876,13 +891,12 @@
 				key_val=0;
 			}
 
-			var context = this;
-
 			jQuery.getJSON("<?php echo plugins_url('locations.php', __FILE__); ?>", {'q':key_val, requestNumber: ++latestRequestNumber}, function(data) {
 
 				if (data.requestNumber < latestRequestNumber) {
 					return;
 				}
+
 				if (data.locations != '' && key_val != '0') {
 					jQuery.each(data.locations, function(index, value ) {
 						html = html+'<li onclick="get_value(\''+value.postcode+'\',\''+value.locality+'\',\''+ context.id +'\')">'+value.postcode+', '+value.locality+'</li>';
@@ -894,26 +908,27 @@
 					jQuery(".autocomplete-div").html(main_content);
 					jQuery(".autocomplete-div").css('left', position.left);
 					jQuery(".autocomplete-div").css('top', parseInt(position.top) + 30);
+
 				} else {
 						html = html+'<li>No Results Found</li>';
 		                var main_content = '<ul id="auto_complete">'+html+'</ul>';
-		               
 		                jQuery(".autocomplete-div").show();
 				        jQuery(".autocomplete-div").html(main_content);
 				        jQuery(".autocomplete-div").css('left', position.left);
 				        jQuery(".autocomplete-div").css('top', parseInt(position.top) + 30);
 				        jQuery(".autocomplete-div").css('overflow-y','hidden');
-
 				        jQuery(context).removeClass('loadinggif');
 				}
 
 				jQuery(context).removeClass('loadinggif');
 			});
 		});
+	}
 
-	});
 
-	jQuery('.form-table').on('input', 'input[type="number"]', function() {
+	function numberValidation() {
+		// on input
+		jQuery('.form-table').on('input', 'input[type="number"]', function() {
 			jQuery(this).each(function() {
 				if(jQuery(this).val() <= 0 && jQuery(this).val()){ 
 					alert('Please input valid value.');
@@ -924,7 +939,75 @@
 					jQuery(this).css('border', '1px solid #ddd');
 				}
 			});
-	});
+		});
+	}
+
+
+	function authtypechange() {
+		// on change
+		jQuery('#woocommerce_woocommerce_transdirect_authtype').on('change', function() {
+			if(jQuery('#woocommerce_woocommerce_transdirect_authtype').val() == "API Key") {
+				
+				if(!validateEmail(jQuery('#woocommerce_woocommerce_transdirect_email').val())) {
+					jQuery('#woocommerce_woocommerce_transdirect_email').val("");
+					jQuery('#woocommerce_woocommerce_transdirect_password').val("");
+				}
+
+				jQuery('.api-key').show();
+				jQuery('.password-email').hide();
+			
+			} else if(jQuery('#woocommerce_woocommerce_transdirect_authtype').val() == "Email and Password") {
+
+				if(!validateEmail(jQuery('#woocommerce_woocommerce_transdirect_email').val())) {
+					jQuery('#woocommerce_woocommerce_transdirect_email').val("");
+					jQuery('#woocommerce_woocommerce_transdirect_password').val("");
+				}
+
+				jQuery('.password-email').show();
+				jQuery('.api-key').hide();
+			}
+		});
+	}
+
+
+	function order_details() {
+		jQuery('.order .order-status-sync').on('click', function(e) {    
+			jQuery('.from-address input[type="text"]').each(function() {
+				if(!jQuery(this).val()) {
+					jQuery(this).css('border', '1px solid red');
+					e.preventDefault();
+				}
+			});
+		}); 
+
+		jQuery('.from-address').on('input', 'input[type="text"]', function() {
+			 if(!jQuery(this).val()) {
+			 	jQuery('.order .order-status-sync').removeAttr('checked');
+			 } else {
+			 	jQuery(this).css('border', '1px solid transparent');
+			 }
+		}); 
+
+		jQuery('.submit input[name="save"]').on('click', function() {
+			if(jQuery('#woocommerce_woocommerce_transdirect_authtype').val() == "API Key") {
+				if(!validateEmail(jQuery('#woocommerce_woocommerce_transdirect_email').val())) {
+					jQuery('#woocommerce_woocommerce_transdirect_email').val("");
+					jQuery('#woocommerce_woocommerce_transdirect_password').val("");
+				}
+			}
+		});
+	}
+
+	function auth_details() {
+		if(jQuery('#woocommerce_woocommerce_transdirect_authtype').val() == "API Key") {
+			jQuery('.api-key').show();
+			jQuery('.password-email').hide();
+
+		} else if(jQuery('#woocommerce_woocommerce_transdirect_authtype').val() == "Email and Password"){
+			jQuery('.api-key').hide();
+			jQuery('.password-email').show();
+		}
+	}
 
 	function get_value(postcode, locality, context) {
 		jQuery('#'+ context).val(postcode + ',' + locality);
@@ -998,5 +1081,11 @@
 	 		} 
 		});
 	}
-</script>
 
+
+	function validateEmail(email) {
+	    var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+	    return re.test(email);
+	}
+
+</script>

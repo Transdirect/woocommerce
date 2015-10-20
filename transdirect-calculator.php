@@ -158,6 +158,26 @@ global $woocommerce, $wpdb; ?>
 	    -ms-user-select: none;
 	    -o-user-select: none;
 	}
+
+
+	/* CHECKOUT */
+	form.checkout.woocommerce-checkout .tdCalc{
+		margin-top: 80px;
+	}
+
+
+	#to_location {
+		width: 100%;
+	}
+
+	#residential {
+		margin-left: 15px;
+	}
+
+	#btn-get-quote {
+	    margin-top: 30px;
+    	text-align: center;
+	}
 </style>
 
 <?php 
@@ -274,7 +294,7 @@ global $woocommerce, $wpdb; ?>
 			(jQuery('body #billing_postcode').val() && jQuery('body #billing_city').val())) {
 
 			document.getElementById('to_location').value = jQuery('body #billing_postcode').val() +','+ jQuery('body #billing_city').val();
-			jQuery('body .button.calculator').click();
+			// jQuery('body .button.calculator').click();
 		} 
 
 	
@@ -423,7 +443,7 @@ global $woocommerce, $wpdb; ?>
 						</p> -->
 					<?php //} ?>
 
-					<p>
+					<p id="btn-get-quote">
 						<button type="button" name="calc_shipping" value="1" class="button calculator btn-warning" 
 						onclick="javascript:validate('<?php echo plugins_url('quotes.php', __FILE__); ?>');">
 							<?php _e('Get a quote', 'woocommerce'); ?>
