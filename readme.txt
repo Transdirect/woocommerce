@@ -2,7 +2,7 @@
 Contributors: transdirect, bywave
 Tags: transdirect, quote, quotes, quick quotes, courier, couriers, freight, freights, shipping, delivery, toll, toll ipec, fastway, couriers please, toll priority, northline, mainfreight, cart, checkout, configurable, woocommerce, woo-commerce, ecommerce, e-commerce, commerce, wordpress ecommerce
 Requires at least: 3.8
-Tested up to: 4.2
+Tested up to: 4.3
 Stable tag: 1.8
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -112,4 +112,8 @@ This section describes how to install the plugin and get it working.
 
 = 2.1 =
 * Fixed memory allocation exhausted. 
-* Add requesting site pass in api for analytics.
+* Added requesting site pass in api for analytics.
+
+= 2.2 =
+* Added two way authentication API Key and Email Password
+* Fix tax issue computation.

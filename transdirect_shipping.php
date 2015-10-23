@@ -4,7 +4,7 @@
  * Plugin URI: https://www.transdirect.com.au/e-commerce/woo-commerce/
  * Description: This plugin allows you to calculate shipping as per your delivery location.
  * FAQ: https://www.transdirect.com.au/e-commerce/woo-commerce/
- * Version: 2.1
+ * Version: 2.2
  * Author: Transdirect
  * Author URI: http://transdirect.com.au/
  * Text Domain: woocommerce_transdirect
@@ -664,9 +664,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
     */
     function myajaxdb_submit() {
         global $wpdb;
-        // woocommerce_transdirect_init();
         $wpdb->query("DELETE FROM `$wpdb->options` WHERE `option_name` LIKE ('_transient_cp_quote_%') OR `option_name` LIKE ('_transient_timeout_cp_quote_%') OR `option_name` LIKE ('_transient_wc_ship_%')" );
-        // WC()->cart->totals();
         if (!session_id()) session_start();
         $_SESSION['price'] =  $_REQUEST['shipping_price'];
         $_SESSION['selected_courier'] = $_REQUEST['shipping_name'];
@@ -1279,5 +1277,31 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
         if (!$_POST['billing_postcode'] || !is_numeric($_POST['billing_postcode']))
             wc_add_notice( __( 'Please enter a valid postcode/ZIP.' ), 'error' );
     }
+
+
+    add_action('woocommerce_thankyou', 'custom_process_order', 10, 1);
+    function custom_process_order($order_id) {
+        unset($_SESSION['price']);
+    }
+
+      
+    /**
+    *
+    * Hook add filter to remove session price.
+    *
+    */
+    add_filter( 'woocommerce_add_cart_item_data', 'wdm_empty_cart', 10, 3);
+
+    /**
+    *
+    * Unset session for price.
+    * @access public
+    *
+    */
+    function wdm_empty_cart()
+    {
+        unset($_SESSION['price']);
+    }
+
 
 }

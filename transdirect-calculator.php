@@ -4,7 +4,7 @@
  *
  * @author 		WooThemes
  * @package 	WooCommerce/Templates
- * @version     2.1
+ * @version     2.2
  */
  
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
@@ -178,6 +178,10 @@ global $woocommerce, $wpdb; ?>
 	    margin-top: 30px;
     	text-align: center;
 	}
+
+	.woocommerce .shipping-calculator-form1 form.checkout .col2-set .form-row {
+		width: 100% !important; 
+	}
 </style>
 
 <?php 
@@ -282,9 +286,7 @@ global $woocommerce, $wpdb; ?>
 ?>
 
 <script>
-
 	jQuery(document).ready(function() {
-
 		jQuery('body').click(function() {
 			jQuery('#autocomplete-div').hide('');
 			jQuery('#dynamic_content').hide('');
@@ -462,13 +464,7 @@ global $woocommerce, $wpdb; ?>
 <?php endif; ?>
 
 <script type="text/javascript">
-	jQuery(document).ready(function() {
-		if(jQuery('select.shipping_method').val() == 'woocommerce_transdirect') {
-			jQuery('.tdCalc').show();
-		} else {
-			jQuery('.tdCalc').hide();
-		}
-	});
+
 	jQuery( document ).on( 'change', 'select.shipping_method, input[name^=shipping_method]', function() {
 		if(jQuery(this).val() == 'woocommerce_transdirect') {
 			jQuery('.tdCalc').show();
@@ -479,6 +475,12 @@ global $woocommerce, $wpdb; ?>
 
 	jQuery(document).ready(function() {
 		if(jQuery('li input:radio.shipping_method:checked').val() == 'woocommerce_transdirect') {
+			jQuery('.tdCalc').show();
+		} else {
+			jQuery('.tdCalc').hide();
+		}
+
+		if(jQuery('select.shipping_method').val() == 'woocommerce_transdirect') {
 			jQuery('.tdCalc').show();
 		} else {
 			jQuery('.tdCalc').hide();
