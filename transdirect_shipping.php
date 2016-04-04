@@ -71,7 +71,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 
                     // This is part of the settings API. Override the method to add your own settings
                     $this->init_form_fields();
-                   
+
                     // This is part of the settings API. Loads settings you previously init.
                     $this->init_settings();
 
@@ -141,12 +141,12 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                     $response = wp_remote_retrieve_body(wp_remote_get($link, $args));
                     $couriers_name = json_decode($response);
                     wp_localize_script( 'your-script-name', 'MyAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));
-                   
+
                     include 'part_htm.php';
                 }
-                
+
                 /**
-                *  
+                *
                 * Process admin transdirect setting options in database.
                 * @access public
                 * @return boolean
@@ -160,7 +160,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 
                         $data = array();
                         $field    = 'woocommerce_woocommerce_transdirect_';
-                        
+
                         foreach($_POST as $k => $val) {
                             $key = str_replace ($field,'',$k);
                             $data[$key] = $val;
@@ -168,17 +168,17 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 
                         $default_values_plugin = serialize($data);
                         $shipping_details_plugin = $wpdb->get_results("SELECT `option_value` FROM ". $wpdb->prefix ."options WHERE `option_name` like '%woocommerce_transdirect_settings'");
-                    
+
                         if(count($shipping_details_plugin) > 0) {
                             $wpdb->query("UPDATE ". $wpdb->prefix ."options SET  `option_value`='".$default_values_plugin."' WHERE `option_name` like  '%woocommerce_transdirect_settings'");
                         } else {
                             //Changed by Lee
                             $wpdb->query("INSERT INTO ". $wpdb->prefix ."options SET  `option_value`='".$default_values_plugin."', `option_name` = 'woocommerce_woocommerce_transdirect_settings'");
-                        }   
+                        }
                     }
                     return true;
                 }
-            
+
                 /**
                 *
                 * Calculate the rate - This is where you'll add your rates
@@ -187,10 +187,10 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                 */
                 public function calculate_shipping($package) {
                     global $woocommerce, $wpdb;
-                    
+
                     $shipping_details_plugin = $wpdb->get_results("SELECT `option_value` FROM " . $wpdb->prefix ."options WHERE `option_name` like '%woocommerce_transdirect_settings'");
                     $shipping_data = unserialize($shipping_details_plugin[0]->option_value);
-                    
+
                     if ($shipping_data !='')
                         $label = __($shipping_data['title'], $this->id);
                     else
@@ -223,16 +223,16 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 
     /**
     *
-    * Add Transdirect method. 
+    * Add Transdirect method.
     * @access public
     * @return method name.
     *
     */
     function woocommerce_transdirect_add($methods) {
-        $methods[] = 'WC_Transdirect_Shipping'; 
+        $methods[] = 'WC_Transdirect_Shipping';
         return $methods;
     }
-    
+
     //include 'transdirect-calculator.php';
 
     /**
@@ -254,11 +254,11 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 
     /**
     *
-    * Returns the custom price to cart total. 
+    * Returns the custom price to cart total.
     * @access public
     *
     */
-    // function return_custom_price() {  
+    // function return_custom_price() {
 
     //     global $post, $woocommerce;
     //     if (!session_id())session_start();
@@ -269,15 +269,15 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
     //             $_SESSION['price'] =  $_REQUEST['shipping_price'];
     //         }
     //         // test($_SESSION['price']);
-    //         WC()->shipping->shipping_total = $_SESSION['price'];    
+    //         WC()->shipping->shipping_total = $_SESSION['price'];
     //         WC()->cart->total = WC()->cart->subtotal + $_SESSION['price'];
-    //         WC()->session->shipping_total  = '0';   
+    //         WC()->session->shipping_total  = '0';
     //         WC()->session->total = WC()->session->subtotal + $_SESSION['price'];
     //         WC()->session->set('shipping_total', $_SESSION['price']);
     //     } else {
     //         unset($_SESSION['price']);
     //     }
-    // }    
+    // }
 
     /**
     *
@@ -285,11 +285,11 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
     *
     */
     add_action( 'woocommerce_after_order_notes', 'my_custom_checkout_field' );
-    
+
 
     /**
     *
-    * Add Booking Id, Selected courier for custom checkout field. 
+    * Add Booking Id, Selected courier for custom checkout field.
     * @access public
     *
     */
@@ -306,20 +306,20 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
             'class'         => array('my-field-class form-row-wide'),
 
             ), $_SESSION['booking_id']);
-     
-        echo '</div>';     
+
+        echo '</div>';
     }
-     
+
     /**
     *
     * Hook for adding action for woocommerce_checkout_update_order_meta
     *
     */
     add_action( 'woocommerce_checkout_update_order_meta', 'my_custom_checkout_field_update_order_meta' );
-     
+
     /**
     *
-    * Add Booking Id, Selected courier for order details. 
+    * Add Booking Id, Selected courier for order details.
     * @access public
     *
     */
@@ -329,17 +329,17 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
             update_post_meta( $order_id, 'Booking ID', sanitize_text_field( $_POST['booking_id'] ) );
         }
     }
-    
+
     /**
     *
     * Hook for adding action for woocommerce_admin_order_data_after_billing_address
     *
     */
     add_action( 'woocommerce_admin_order_data_after_billing_address', 'my_custom_checkout_field_display_admin_order_meta', 10, 1 );
-    
+
     /**
     *
-    * Add Selected Courier to display in order details. 
+    * Add Selected Courier to display in order details.
     * @access public
     *
     */
@@ -347,10 +347,10 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
         echo '<p><strong>'.__('Selected Courier').':</strong> ' . get_post_meta( $order->id, 'Selected Courier', true ) . '</p>';
         // echo '<p><strong>'.__('Booking ID').':</strong> ' . get_post_meta( $order->id, 'Booking ID', true ) . '</p>';
     }
-    
+
     /**
     *
-    * Add Css and javascript files. 
+    * Add Css and javascript files.
     * @access public
     *
     */
@@ -372,14 +372,14 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
     *
     */
     do_action('wp_ajax_nopriv_cronstarter_activation');
-    
+
     /**
     *
     * Hook is fired if the current viewer is logged in
     *
     */
     do_action('wp_ajax_cronstarter_activation');
-    
+
 
     /**
     *
@@ -397,7 +397,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
     * @access public
     *
     */
-    function cronstarter_activation() { 
+    function cronstarter_activation() {
         wp_clear_scheduled_hook('mycronjob');
         wp_schedule_event( time(), '5mins', 'mycronjob' );
     }
@@ -408,7 +408,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
     *
     */
     add_action('wp', 'cronstarter_activation');
-    
+
     /**
     *
     * Set up time interval for cron job schedules.
@@ -422,7 +422,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
             'display' => __( 'Once Every Five Minutes' )
         );
         return $schedules;
-    }   
+    }
 
 
     /**
@@ -438,9 +438,9 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
     * @access public
     *
     */
-    function cronstarter_deactivate() { 
+    function cronstarter_deactivate() {
         wp_clear_scheduled_hook('mycronjob');
-    } 
+    }
 
     /**
     *
@@ -474,7 +474,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
         }
         return $args;
     }
-    
+
     /**
     *
     * Set up process when running the cron job.
@@ -482,11 +482,11 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
     *
     */
     function my_repeat_function() {
-        global $wpdb;   
+        global $wpdb;
 
         $shipping_details_plugin = $wpdb->get_results("SELECT `option_value` FROM ". $wpdb->prefix ."options WHERE `option_name` like '%woocommerce_transdirect_settings'");
         $default_values = unserialize($shipping_details_plugin[0]->option_value);
-      
+
         $filters = array(
             'post_status' => 'any',
             'post_type' => 'shop_order',
@@ -524,7 +524,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                 $product_id = $item['product_id'];
                 $product_variation_id = $item['variation_id'];
 
-                if ($product_variation_id) { 
+                if ($product_variation_id) {
                     $product = new WC_Product($item['variation_id']);
                 } else {
                     $product = new WC_Product($item['product_id']);
@@ -540,7 +540,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
             if($default_values['order_status'] == $statuses && $default_values['order_date'] >= $from_date) {
                 $booking_id = get_post_meta($order->id, 'Booking ID', true);
                 $selected_courier = get_post_meta($order->id, 'Selected Courier', true);
-                
+
                 $api_array['transdirect_order_id']  = (int) $booking_id;
                 $api_array['order_id'] = $order->id;
                 $api_array['goods_summary'] = $sku;
@@ -611,7 +611,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                     $args2 = request_method_headers($default_values['authtype'], $default_values['api_key'], $default_values['email'], $default_values['password'], $api_array, 'POST');
 
                     $link2 = "https://www.transdirect.com.au/api/orders/";
-                    $response2 = wp_remote_retrieve_body(wp_remote_post($link2, $args2));                
+                    $response2 = wp_remote_retrieve_body(wp_remote_post($link2, $args2));
                 }
             }
         }
@@ -622,7 +622,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
     * Hook add action that function onto our scheduled event.
     *
     */
-    add_action ('mycronjob', 'my_repeat_function'); 
+    add_action ('mycronjob', 'my_repeat_function');
 
 
     /**
@@ -679,14 +679,14 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
     *
     */
     do_action('wp_ajax_nopriv_myajax-submit');
-    
+
     /**
     *
     * Hook  is fired if the current viewer is logged in.
     *
     */
     do_action('wp_ajax_myajax-submit');
-    
+
     /**
     *
     * Hook  is fired when event submit is called.
@@ -758,7 +758,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
             $_SESSION['postcode'] =  $api_arr['receiver']['postcode'];
             $_SESSION['to_location'] = $api_arr['receiver']['suburb'];
 
-            
+
             $cart_content = WC()->cart->get_cart();
             $i = 0;
 
@@ -771,35 +771,35 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                     if (!empty($meta_values['_weight']['0']))  {
                         $api_arr['items'][$i]['weight'] = $meta_values['_weight']['0'];
                     }
-                    else { 
+                    else {
                         $api_arr['items'][$i]['weight'] = $default_values['weight'];
                     }
                     // If less than 1
                     if (!empty($meta_values['_weight']['0']) && $api_arr['items'][$i]['weight'] < 1) {
                         $api_arr['items'][$i]['weight'] = '1.0';
                     }
-                
+
                     if (!empty($meta_values['_height']['0']))   {
                         $api_arr['items'][$i]['height'] = $meta_values['_height']['0'];
                     }
                     else {
                         $api_arr['items'][$i]['height'] = $default_values['height'];
                     }
-                
+
                     if (!empty($meta_values['_width']['0'])) {
                         $api_arr['items'][$i]['width'] = $meta_values['_width']['0'];
                     }
                     else {
                         $api_arr['items'][$i]['width'] = $default_values['width'];
                     }
-                
+
                     if (!empty($meta_values['_length']['0'])) {
                         $api_arr['items'][$i]['length'] = $meta_values['_length']['0'];
                     }
                     else {
                         $api_arr['items'][$i]['length'] = $default_values['length'];
                     }
-                
+
                     $api_arr['items'][$i]['quantity'] = $cc['quantity'];
                     $api_arr['items'][$i]['description'] = 'carton';
 
@@ -808,7 +808,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                         $api_arr['items'][$i]['height'] =  wc_get_dimension($api_arr['items'][$i]['height'], get_option('woocommerce_dimension_unit'));
                         $api_arr['items'][$i]['length'] =  wc_get_dimension($api_arr['items'][$i]['length'], get_option('woocommerce_dimension_unit'));
                         $api_arr['items'][$i]['width']  =  wc_get_dimension($api_arr['items'][$i]['width'], get_option('woocommerce_dimension_unit'));
-                    } 
+                    }
 
                     if(get_option('woocommerce_weight_unit') != 'kg') {
                         $api_arr['items'][$i]['weight']  = wc_get_weight( $api_arr['items'][$i]['weight'], get_option('woocommerce_weight_unit'));
@@ -816,7 +816,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 
                     if($default_values['enabled_group_box'] == 'yes' && $default_values['box_size'] != '')  {
                         $cubic_weight = ($api_arr['items'][$i]['length'] * $api_arr['items'][$i]['width'] * $api_arr['items'][$i]['height']) / 250;
-                            
+
                         if($api_arr['items'][$i]['weight'] > $cubic_weight) {
                             $cubic_weight = $api_arr['items'][$i]['weight'];
                         }
@@ -840,7 +840,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                                     array_push($items_list, array(
                                         'itemidx' => $i,
                                         'cubic_weight' => $r
-                                    )); 
+                                    ));
                                 }
 
                             } else {
@@ -884,7 +884,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 
             $args = array();
             $args =  request_method_headers($default_values['authtype'], $default_values['api_key'], $default_values['email'], $default_values['password'], $api_arr, 'POST');
-        
+
             $link = "https://www.transdirect.com.au/api/bookings";
             $response = wp_remote_retrieve_body(wp_remote_post($link, $args));
             $response = str_replace("true, // true if the booking has a tailgate pickup, false if not", "0,", $response);
@@ -930,12 +930,12 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                         } else {
                             $base = $k;
                         }
-                          
+
                         if($default_values['enabsurg_'.$base] == 'yes') {
                             if($default_values['cu_'. $base] == '%'){
                                  $default_values['cg_'.$base] = $default_values['cg_'.$base] / 100;
-                            } 
-                            $individual_handling_surcharge = number_format($default_values['cg_'.$base], 2); 
+                            }
+                            $individual_handling_surcharge = number_format($default_values['cg_'.$base], 2);
                             $total_price += $individual_handling_surcharge;
                         }
 
@@ -960,9 +960,9 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                         if (!empty($default_values['cor_'.$base])) {
                             //push data in an  array to access after the loop
                             array_push($total_quote, array(
-                                'courier' => $courier_name, 
-                                'totals' =>  $total_price, 
-                                'transit_time' => $sq->transit_time, 
+                                'courier' => $courier_name,
+                                'totals' =>  $total_price,
+                                'transit_time' => $sq->transit_time,
                                 'service_type' => $sq->service_type
                                 )
                             );
@@ -974,149 +974,149 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                     usort($total_quote, "cmp");
 
                     foreach ($total_quote as $key => $value) {
-                
+
                     // Replace spaces to _ for reading input id in
-                     $replace =  preg_replace('~([^a-zA-Z\n\r()]+)~', '_', 
+                     $replace =  preg_replace('~([^a-zA-Z\n\r()]+)~', '_',
                         $total_quote[$key]['courier']);
 
                         if ($default_values['quotes'] == 'Display all Quotes') {
 
-                        $quotes['couriers'][$total_quote[$key]['courier']]['html'] = 
-                        '<input type="radio" name="shipping_type_radio" class="shipping_type_radio" onclick="get_quote(\'' .  $replace . '\');" 
-                        id="' .  $replace . '" value="' .  $replace. '" />' . 
-                        '<b>' . $total_quote[$key]['courier'] . 
-                        '</b> &nbsp;-&nbsp;' . get_woocommerce_currency_symbol() . 
+                        $quotes['couriers'][$total_quote[$key]['courier']]['html'] =
+                        '<input type="radio" name="shipping_type_radio" class="shipping_type_radio" onclick="get_quote(\'' .  $replace . '\');"
+                        id="' .  $replace . '" value="' .  $replace. '" />' .
+                        '<b>' . $total_quote[$key]['courier'] .
+                        '</b> &nbsp;-&nbsp;' . get_woocommerce_currency_symbol() .
                         '&nbsp;'. number_format($total_quote[$key]['totals'], 2) . '<br/>
-                                
 
-                        <input type="hidden" name="' .  $replace . '_price" 
+
+                        <input type="hidden" name="' .  $replace . '_price"
                         id="' .  $replace .'_price" value="' . $total_quote[$key]['totals']. '" />
 
-                        <input type="hidden" name="' . $total_quote[$key]['courier'] . '_transit_time" 
-                        id="' .  $replace . '_transit_time" 
+                        <input type="hidden" name="' . $total_quote[$key]['courier'] . '_transit_time"
+                        id="' .  $replace . '_transit_time"
                         value="' . $total_quote[$key]['transit_time'] . '" />
 
-                        <input type="hidden" name="' .  $replace . '_service_type" 
-                        id="' . $replace . '_service_type" 
+                        <input type="hidden" name="' .  $replace . '_service_type"
+                        id="' . $replace . '_service_type"
                         value="' . $total_quote[$key]['service_type'] . '" />';
 
                         } elseif ($default_values['quotes'] == 'Display Cheapest') {
 
-                            if ($quotes['cheapest']['price'] > $total_quote[$key]['totals'] || 
+                            if ($quotes['cheapest']['price'] > $total_quote[$key]['totals'] ||
                                 !isset($quotes['cheapest']['price'])) {
-                                
+
                                 $quotes['cheapest']['price'] = $total_quote[$key]['totals'];
-                            
+
                                 // Initialize array to remove previous values
                                 $quotes['cheapest']['couriers'] = null;
-                              
+
                           $quotes['cheapest']['couriers'][$total_quote[$key]['courier']] =
-                                '<input type="radio" name="shipping_type_radio" 
-                                class="shipping_type_radio" onclick="get_quote(\'' . $replace . '\');" 
-                                id="' . $replace . '" value="' . $replace . '" />' . 
-                                '<b>' . $total_quote[$key]['courier'] . 
-                                '</b>&nbsp;-&nbsp;' . get_woocommerce_currency_symbol() . 
+                                '<input type="radio" name="shipping_type_radio"
+                                class="shipping_type_radio" onclick="get_quote(\'' . $replace . '\');"
+                                id="' . $replace . '" value="' . $replace . '" />' .
+                                '<b>' . $total_quote[$key]['courier'] .
+                                '</b>&nbsp;-&nbsp;' . get_woocommerce_currency_symbol() .
                                 '&nbsp;' . number_format($total_quote[$key]['totals'], 2). '<br/>
 
 
-                                <input type="hidden" name="' . $replace . '_price" 
-                                id="' . $replace . '_price" 
+                                <input type="hidden" name="' . $replace . '_price"
+                                id="' . $replace . '_price"
                                 value="' . number_format($total_quote[$key]['totals'], 2) . '" />
-                                        
-                                <input type="hidden" name="' . $replace . '_transit_time" 
-                                id="' . $replace . '_transit_time" 
+
+                                <input type="hidden" name="' . $replace . '_transit_time"
+                                id="' . $replace . '_transit_time"
                                 value="' . $total_quote[$key]['transit_time'] . '" />
 
-                                <input type="hidden" name="' . $replace . '_service_type" 
-                                id="' . $replace . '_service_type" 
+                                <input type="hidden" name="' . $replace . '_service_type"
+                                id="' . $replace . '_service_type"
                                 value="' . $total_quote[$key]['service_type'] . '" />';
 
-                            } elseif ($quotes['cheapest']['price'] == $total_quote[$key]['totals'] || 
+                            } elseif ($quotes['cheapest']['price'] == $total_quote[$key]['totals'] ||
                                 !isset($quotes['cheapest']['price'])) {
 
-                                $quotes['cheapest']['couriers'][$total_quote[$key]['courier']] = '<input type="radio" name="shipping_type_radio" class="shipping_type_radio" 
-                                    onclick="get_quote(\'' . $replace . '\');" 
+                                $quotes['cheapest']['couriers'][$total_quote[$key]['courier']] = '<input type="radio" name="shipping_type_radio" class="shipping_type_radio"
+                                    onclick="get_quote(\'' . $replace . '\');"
                                     id="' . $replace . '" value="' . $replace . '" />
-                                    ' . '<b>' . $total_quote[$key]['courier'] . 
-                                    '</b>&nbsp;-&nbsp;' . get_woocommerce_currency_symbol() . 
+                                    ' . '<b>' . $total_quote[$key]['courier'] .
+                                    '</b>&nbsp;-&nbsp;' . get_woocommerce_currency_symbol() .
                                     '&nbsp;' . number_format($total_quote[$key]['totals'], 2) . '<br/>
 
-                                        <input type="hidden" name="' . $replace . '_price" 
-                                        id="' . $replace . '_price" 
+                                        <input type="hidden" name="' . $replace . '_price"
+                                        id="' . $replace . '_price"
                                         value="' . number_format($total_quote[$key]['totals'], 2) . '" />
 
-                                        <input type="hidden" name="' . $replace . '_transit_time" id="' . $replace . '_transit_time" 
+                                        <input type="hidden" name="' . $replace . '_transit_time" id="' . $replace . '_transit_time"
                                         value="' . $total_quote[$key]['transit_time'] . '" />
 
-                                        <input type="hidden" name="' . $replace . '_service_type" 
-                                        id="' . $replace . '_service_type" 
+                                        <input type="hidden" name="' . $replace . '_service_type"
+                                        id="' . $replace . '_service_type"
                                         value="' . $total_quote[$key]['service_type'] . '" />';
                             } //end of inner if
 
                         } elseif ($default_values['quotes'] == 'Display Cheapest Fastest') {
-                                    
+
                                     $timeDay = explode(' ', $sq->transit_time);
                                     $timeNoDay = explode('-', $timeDay[0]);
                                     $fastest = $timeDay[0] == '' ? 0 : $timeNoDay[0];
-                                    
-                                    if ($quotes['fastest']['day'] > $fastest || 
+
+                                    if ($quotes['fastest']['day'] > $fastest ||
                                         !isset($quotes['fastest']['day'])) {
 
-                                        
+
 
                                         $quotes['fastest']['day'] = $fastest;
-                                        
+
                                         // Initialize array to remove previous values
                                         $quotes['fastest']['couriers'] = null;
-                                        $quotes['fastest']['couriers'][$total_quote[$key]['courier']] = '<input type="radio" name="shipping_type_radio" class="shipping_type_radio" 
-                                            onclick="get_quote(\'' . $replace . '\');" 
-                                            id="' . $replace . '" 
-                                            value="' . $replace . '" /> ' . 
-                                            $total_quote[$key]['courier'] . ' - ' . 
-                                            get_woocommerce_currency_symbol() . 
+                                        $quotes['fastest']['couriers'][$total_quote[$key]['courier']] = '<input type="radio" name="shipping_type_radio" class="shipping_type_radio"
+                                            onclick="get_quote(\'' . $replace . '\');"
+                                            id="' . $replace . '"
+                                            value="' . $replace . '" /> ' .
+                                            $total_quote[$key]['courier'] . ' - ' .
+                                            get_woocommerce_currency_symbol() .
                                             number_format($total_quote[$key]['totals'], 2) . '<br/>
 
-                                        <input type="hidden" name="' . $replace . '_price" 
-                                        id="' . $replace . '_price" 
+                                        <input type="hidden" name="' . $replace . '_price"
+                                        id="' . $replace . '_price"
                                         value="' . number_format($total_quote[$key]['totals'], 2) . '" />
 
-                                        <input type="hidden" name="' . $replace . '_transit_time" 
-                                        id="' . $replace . '_transit_time" 
+                                        <input type="hidden" name="' . $replace . '_transit_time"
+                                        id="' . $replace . '_transit_time"
                                         value="' . $total_quote[$key]['transit_time'] . '" />
 
-                                        <input type="hidden" name="' . $replace . '_service_type" 
-                                        id="' .$replace . '_service_type" 
+                                        <input type="hidden" name="' . $replace . '_service_type"
+                                        id="' .$replace . '_service_type"
                                         value="' . $total_quote[$key]['service_type'] . '" />';
 
-                                    } elseif ($quotes['fastest']['day'] == $fastest || 
+                                    } elseif ($quotes['fastest']['day'] == $fastest ||
                                         !isset($quotes['fastest']['day'])) {
-                                        
-                                    $quotes['fastest']['couriers'][$total_quote[$key]['courier']] = 
-                                    '<input type="radio" name="shipping_type_radio" class="shipping_type_radio" 
-                                        onclick="get_quote(\'' . $replace . '\');" 
-                                        id="' . $replace . '" 
+
+                                    $quotes['fastest']['couriers'][$total_quote[$key]['courier']] =
+                                    '<input type="radio" name="shipping_type_radio" class="shipping_type_radio"
+                                        onclick="get_quote(\'' . $replace . '\');"
+                                        id="' . $replace . '"
                                         value="' . $replace . '" />
-                                        ' . $total_quote[$key]['courier'] . ' - ' . 
-                                        get_woocommerce_currency_symbol() . 
+                                        ' . $total_quote[$key]['courier'] . ' - ' .
+                                        get_woocommerce_currency_symbol() .
                                         number_format($total_quote[$key]['totals'], 2). '<br/>
 
-                                    <input type="hidden" name="' . $replace . '_price" 
-                                    id="' . $replace . '_price" 
+                                    <input type="hidden" name="' . $replace . '_price"
+                                    id="' . $replace . '_price"
                                     value="' .  number_format($total_quote[$key]['totals'], 2) . '" />
 
-                                    <input type="hidden" name="' . $replace . '_transit_time" 
-                                    id="' . $replace . '_transit_time" 
+                                    <input type="hidden" name="' . $replace . '_transit_time"
+                                    id="' . $replace . '_transit_time"
                                     value="' . $total_quote[$key]['transit_time'] . '" />
 
-                                    <input type="hidden" name="' . $replace . '_service_type" 
-                                    id="' . $replace . '_service_type" 
+                                    <input type="hidden" name="' . $replace . '_service_type"
+                                    id="' . $replace . '_service_type"
                                     value="' . $total_quote[$key]['service_type'] . '" />';
                                     }
                                 }
-                    }   
+                    }
             } //end of IF($shipping_quotes);
 
-            $html = '<span class="close-option" style="float:right;"><a href="javascript:void(0)" title="close" 
+            $html = '<span class="close-option" style="float:right;"><a href="javascript:void(0)" title="close"
             onclick="document.getElementById(\'shipping_type\').style.display=\'none\';">Close</a></span>';
 
             if ($default_values['quotes'] == 'Display all Quotes') {
@@ -1146,18 +1146,18 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
                 //echo 'No data found';
             }
 
-        
+
                 header( "Content-Type: text/html" );
                 echo $html;
-        
+
         } //end of IF (!empty(WC()->session->chosen_shipping_methods[0])
         else {
-            
+
             echo 'No Login Provided';
         }
 
         exit;
-    
+
     }
 
 
@@ -1171,7 +1171,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
         global $woocommerce, $wpdb;
         include 'transdirect-calculator.php';
     }
-    
+
     // add_action('woocommerce_before_shipping_calculator', 'plugin_test');
 
     /**
@@ -1187,7 +1187,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
     // add_filter('woocommerce_checkout_order_review', 'return_custom_price');
     // add_filter('wp_ajax_woocommerce_update_order_review', 'return_custom_price');
     // add_filter('wp_ajax_nopriv_woocommerce_update_order_review', 'return_custom_price');
-    
+
 
     /**
     *
@@ -1207,7 +1207,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 
         global $wpdb;
         if ($method->id == 'woocommerce_transdirect') {
-            
+
             $shipping_details_plugin = $wpdb->get_results( "SELECT `option_value` FROM " . $wpdb->prefix ."options WHERE `option_name` like '%woocommerce_transdirect_settings'");
             $shippin_data = unserialize($shipping_details_plugin[0]->option_value);
 
@@ -1220,7 +1220,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 
             return $full_label;
         } else {
-            return $full_label; 
+            return $full_label;
         }
     }
 
@@ -1247,16 +1247,16 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 
             $shipping_details_plugin = $wpdb->get_results("SELECT `option_value` FROM " . $wpdb->prefix ."options WHERE `option_name` like '%woocommerce_transdirect_settings'");
             $shipping_data = unserialize($shipping_details_plugin[0]->option_value);
-        
+
             // To unset a single rate/method, do the following. This example unsets flat_rate shipping
             if ($shipping_data['enabled'] != 'yes') {
                 unset( $rates['woocommerce_transdirect'] );
             }
         }
-        
+
         return $rates;
     }
-    
+
 
     /**
     *
@@ -1264,7 +1264,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
     *
     */
     add_action('woocommerce_checkout_process', 'my_custom_checkout_field_process');
-    
+
 
     /**
     *
@@ -1284,7 +1284,7 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
         unset($_SESSION['price']);
     }
 
-      
+
     /**
     *
     * Hook add filter to remove session price.
@@ -1305,3 +1305,32 @@ if ( in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 
 
 }
+
+
+//Notify developers of Transdirect's good intentions.
+function print_the_truth() {
+
+  $truth = "Transdirect Pty Ltd should not send commercial emails in Australia unless it is in accordance with the Spam Act 2003.";
+  echo "<p id='truth'>$truth</p>";
+
+}
+add_action( 'admin_notices', 'print_the_truth' );
+
+function truth_css() {
+	// This makes sure that the positioning is also good for right-to-left languages
+	$x = is_rtl() ? 'left' : 'right';
+
+	echo "
+	<style type='text/css'>
+	#truth {
+		float: $x;
+		padding-$x: 15px;
+		padding-top: 5px;
+		margin: 0;
+		font-size: 11px;
+	}
+	</style>
+	";
+}
+
+add_action( 'admin_head', 'truth_css' );
