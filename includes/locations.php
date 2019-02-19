@@ -7,13 +7,12 @@ if(isset($_REQUEST['isInternational'])){
 	curl_setopt($cnt, CURLOPT_SSL_VERIFYPEER, false);
 	$country = curl_exec($cnt);
 	curl_close($cnt);
-
 	echo $country;
 }
-
 if(isset($_REQUEST['q'])){
 	$q = $_REQUEST['q'];
 	if ($q != '0') {
+		$q = str_replace ( ' ', '%20', $q);
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, "https://www.transdirect.com.au/api/locations/search?q=".$q);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
