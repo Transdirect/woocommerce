@@ -1,0 +1,260 @@
+/* Transdirect css */
+
+/* css for admin side td settings page  */
+
+table.form-table.td-shipping {
+		border-collapse:separate;
+		background-color: #ffffff;
+		padding:5px;
+}
+table.form-table.td-shipping td table td {
+	border:none;
+	padding:5px;
+	vertical-align:middle;
+}
+.border-fomat {
+	border:1px solid #ccc;
+}
+#td-main-container {
+	width:800px;
+	padding:10px;
+}
+#td-main-container a {
+	text-decoration: none;
+	color: #fff;
+}
+#td-main-container a:focus {
+	color: #fff;
+}
+.hidden-table {
+	display: none;
+}
+.td-btn-warning, .td-btn-api-key {
+  color: #fff;
+  background-color: #f60;
+  border-color: #e65c00;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+}
+.td-onLineFAQ,
+.td-contactSales {
+	border:1px solid #ddd;
+	background-color: #f60;
+	text-align: center;
+	padding: 40px;
+	cursor: pointer;
+}
+.td-onLineFAQ {
+	margin-left: 10px;
+}
+.td-logoSection {
+	height:145px;
+	margin-top:5px;
+}
+.td-logoSection img {
+	margin-top: 30px;
+}
+@media only screen and (-webkit-min-device-pixel-ratio:2), only screen and (min-resolution:144dpi) {
+	.chosen-container .chosen-results-scroll-down span,
+	.chosen-container .chosen-results-scroll-up span,
+	.chosen-container-multi .chosen-choices .search-choice .search-choice-close,
+	.chosen-container-single .chosen-search input[type=text],
+	.chosen-container-single .chosen-single abbr,
+	.chosen-container-single .chosen-single div b,
+	.chosen-rtl .chosen-search input[type=text] {
+		background-image:url(../images/chosen-sprite@2x.png)!important;
+		background-size:52px 37px!important;
+		background-repeat:no-repeat!important;
+	}
+}
+.td-auth-error {
+	color: #a94442;
+	background-color: #f2dede;
+	border-color: #ebccd1;
+	border: 1px solid transparent;
+}
+.td-btn-api-key {
+	width: 100px;
+	height: 25px;
+	padding: 6px;
+}
+
+/* css for front side td calculator */
+
+.td-shipping-calculator-form1 {
+	position:relative;
+}
+.td-shipping-calculator-form1 p.form-row {
+    width: 100% !important;
+}
+#autocomplete-div, #simple_autocomplete_div {
+	background:#FFFFFF;
+	border: 1px solid #EDEDED;
+	border-radius: 3px 3px 3px 3px;
+	display: none;
+	height: auto;
+	max-height: 150px;
+	margin: -5px 0 0 1px;
+	overflow-y: auto;
+	padding: 5px;
+	position: absolute;
+	width: 189px;
+	z-index: 99;
+	width: 100%;
+}
+#autocomplete-div ul, #simple_autocomplete_div ul {
+	margin: 0 0 0px 0px !important;
+}
+#autocomplete-div ul li, #simple_autocomplete_div ul li {
+	padding:0 !important;
+	margin:0 !important;
+	text-indent:0 !important;
+	list-style: none;
+	cursor:pointer;
+}
+#autocomplete-div ul li:hover, #simple_autocomplete_div ul li:hover {
+	background:#ededed;
+	list-style: none;
+}
+#simple_autocomplete_div {
+	width: 250px;
+	margin: 3px 0 0 1px;
+}
+.td-trans-frm{	
+	right: 0;
+	width:350px !important;
+	text-indent:0;
+	padding:5px;
+	margin-bottom:20px;
+	border:1px solid #ededed;
+	margin-top: 0px;
+	background-color:#FFFFFF;
+	position:relative;
+}
+.td-trans-frm h4 {
+	margin:0 0 0 0 !important;
+}
+.shipping_type {
+	border-top:1px solid #ededed;
+	padding-top:10px;
+	margin-top:10px;
+	text-align:left;
+}
+
+.loadinggif {
+	background:url('../images/ajax-loader.gif') no-repeat right center;
+}
+span.td-close-option {
+	top: -15px;
+	right: 5px;
+	position: relative;
+}
+.td-load {
+	border: none;
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+	height: 100%;
+	top: 0px;
+	left: 0px;
+	z-index:10000000;
+  	opacity: 0.4;
+  	filter: alpha(opacity=40);
+	cursor: wait;
+	position: absolute;
+	background: url('../images/ajax-loader.gif') 50% 50% / 16px 16px no-repeat rgb(255, 255, 255);
+	background-position:center;
+}
+.td-courier-selected {
+	margin-bottom: 0px;
+	/*font-style: italic;*/
+	font-size: 18px;
+}
+.td-link-show-calculator {
+	float: right;
+	margin-bottom: 10px;
+	color: blue;
+	cursor: pointer;
+	font-size: 18px;
+}
+.hide-shipping-calc {
+	display: none;
+}
+.td-btn-warning, .td-btn-warning:focus {
+    color: #fff !important;
+    background-color: #f60 !important;
+    border-color: #e65c00 !important;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+}
+/* CHECKOUT */
+form.checkout.woocommerce-checkout .tdCalc{
+	margin-top: 80px;
+}
+#to_location {
+	width: 100%;
+}
+#to_postcode {
+	width: 100%;
+	margin-top: 10px;
+}
+.td-residential {
+	margin-left: 15px;
+}
+.td-btn-get-quote {
+    margin-top: 30px;
+	text-align: center;
+}
+.woocommerce .td-shipping-calculator-form1 form.checkout .col2-set .form-row {
+	width: 100% !important;
+}
+.td-label {
+	font-weight: bold;
+}
+.td_help_tip {
+	float: right;
+	margin: 0;
+}
+.td-auth-error {
+	background-color: #f2dede;
+    border-color: #ebcccc;
+    color: #a94442;
+}
+.td-auth-success {
+	color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+}
+.td-btn-api-test{
+	height: 30px;
+    width: 80px;
+}
+.td-reset-btn {
+    background: #f60;
+    padding: 3px;
+    margin-left: 15px;
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 3px;
+}
